@@ -1,12 +1,26 @@
 <!DOCTYPE html>
 <html>
     <body>
-        <img
-            src="/static/images/faceWithHeadphonesFilledWebVersion.svg" 
-            alt="artistic rendition of a woman wearing headphones"
-        >
-        <form action="/songs" method="POST">
-            <input type="file" accept=".mp3" onchange="this.form.submit()">
-        </form>
+        <div id="leftSide">
+            <img
+                src="/static/images/faceWithHeadphonesFilledWebVersion.svg" 
+                alt="artistic rendition of a woman wearing headphones"
+            >
+        </div>
+
+        <div id="rightSide">
+            <img
+                src="/static/images/MNNSymbol.svg"
+                alt="MNN Logo"
+            >
+            <img
+                src="/static/images/UploadSymbol.svg"
+            >
+            <form action="/songs" method="POST">
+                <input type="file" accept=".mp3" onchange="this.form.submit()">
+            </form>
+            <div>Upload a Song</div>
+            <div>We'll guess the Genre</div>
+        </div>  
     </body>
 </html>
