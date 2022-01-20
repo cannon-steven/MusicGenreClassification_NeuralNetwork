@@ -6,8 +6,7 @@
             alt="artistic rendition of a woman wearing headphones"
         >
         <form action="/songs" method="POST">
-            <input type="file" accept=".mp3">
-            <input type="submit">
+            <input type="file" accept=".mp3" onchange="this.form.submit()">
         </form>
     </body>
 </html>
