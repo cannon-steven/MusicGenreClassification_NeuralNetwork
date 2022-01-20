@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <script src="/static/js/start.js"></script>
+    <link rel="stylesheet" href="/static/css/start.css">
     <body>
         <div id="leftSide">
             <img
@@ -11,19 +12,22 @@
 
         <div id="rightSide">
             <img
+                id="MNNLogo"
                 src="/static/images/MNNSymbol.svg"
                 alt="MNN Logo"
             >
             <img
+                id ="uploadButton"
                 src="/static/images/UploadSymbol.svg" 
                 onclick="uploadFile()"
-                style="cursor:pointer"
             >
+            <div id="text">
+                <div>Upload a Song</div>
+                <div>We'll guess the Genre</div>
+            </div>
             <form action="/songs" method="POST">
                 <input id="upload" type="file" accept=".mp3" style="display:none;" onchange="this.form.submit()">
             </form>
-            <div>Upload a Song</div>
-            <div>We'll guess the Genre</div>
         </div>  
     </body>
 </html>
