@@ -19,7 +19,9 @@
                 onclick="uploadFile()"
                 style="cursor:pointer"
             >
-            <input id="upload" type="file" accept=".mp3" style="display:none;" onchange="this.form.submit()">
+            <form action="/songs" method="POST">
+                <input id="upload" type="file" accept=".mp3" style="display:none;" onchange="this.form.submit()">
+            </form>
             <div>Upload a Song</div>
             <div>We'll guess the Genre</div>
         </div>  
