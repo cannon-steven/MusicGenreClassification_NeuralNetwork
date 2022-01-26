@@ -24,7 +24,6 @@
 }
 
 #text {
-    font-family: MochiyPopPOne, Verdana, Geneva, Tahoma, sans-serif;
     font-size: 32px;
     display: flex;
     flex-direction: column;
