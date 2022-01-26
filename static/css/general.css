@@ -14,3 +14,7 @@ body {
     flex-direction: row;
     margin: 0;
 }
+
+.mochiyFont {
+    font-family: MochiyPopPOne, Verdana, Geneva, Tahoma, sans-serif;
+}
