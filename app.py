@@ -15,4 +15,4 @@ def start():
 # --- BACKEND API ---
 @app.route("/songs", methods=["POST"])
 def songs():
-    return "Nothing"
+    return render_template('main.html')
