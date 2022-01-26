@@ -1,0 +1,16 @@
+@font-face {
+    font-family: MochiyPopPOne;
+    src: url(/static/fonts/MochiyPopPOne-Regular.ttf);
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+}
