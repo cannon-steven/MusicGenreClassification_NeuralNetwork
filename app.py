@@ -1,4 +1,5 @@
-from flask import Flask, request, Response, render_template, jsonify
+from flask import Flask, request, Response, render_template
+import json
 
 ALLOWED_EXTENSIONS = {'wav'}
 
@@ -38,10 +39,10 @@ def upload_song():
     genreResults = predict_genre(file)
 
     return Response(
-                    response=jsonify({
-                                        "filename": file,
+                    response=json.dumps({
+                                        "filename": file.filename,
                                         "genre": genreResults
-                                    }),
+                                        }),
                     status=201,  # Maybe use 202? Depends on processing time
                     content_type="application/json"
                     )
@@ -49,4 +50,4 @@ def upload_song():
 
 # --- Testing Stubs ---
 def predict_genre(file):
-    return jsonify({"rock": 80, "pop": 20})
+    return {"rock": 80, "pop": 20}
