@@ -53,3 +53,29 @@ def upload_song():
 # --- Testing Stubs ---
 def predict_genre(file):
     return {"rock": 80, "pop": 20}
+
+
+def get_songs():
+    return [
+        {
+            "filename": "beat_it.mp3",
+            "genre": {
+                "rock": 80,
+                "pop": 20
+            }
+        },
+        {
+            "filename": "beat_it.mp3",
+            "genre": {
+                "rock": 80,
+                "pop": 20
+            }
+        },
+        {
+            "filename": "beat_it.mp3",
+            "genre": {
+                "rock": 80,
+                "pop": 20
+            }
+        }
+    ]
