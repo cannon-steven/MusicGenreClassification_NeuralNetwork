@@ -16,11 +16,10 @@ def is_allowed_file(filename):
 
 def getMax(dict):
     """Finds the element in a dictionary whose value is the greatest"""
+    max = None
     for element in dict:
-        max = None
         if max is None or dict[element] > dict[max]:
             max = element
-
     return max
 
 
