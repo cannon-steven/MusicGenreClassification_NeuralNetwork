@@ -16,9 +16,9 @@ def is_allowed_file(filename):
 
 def getMax(dict):
     """Finds the element in a dictionary whose value is the greatest"""
-    max = None
     for element in dict:
-        if dict[element] > dict[max]:
+        max = None
+        if max is None or dict[element] > dict[max]:
             max = element
 
     return max
@@ -33,6 +33,8 @@ def start():
 @app.route("/main")
 def main_web_page():
     content = get_songs()
+    for song in content['songs']:
+        song['primaryGenre'] = getMax(song['genre'])
     return render_template('main.html', **content)
     # The ** operator turns a dictionary into keyword arguments.
     # {'example': 'data', 'ex2': 'data'} -> example='data', ex2='data'
