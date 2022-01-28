@@ -36,6 +36,26 @@
                 <span>No song selected</span>
                 <span>Select a song to see our predictions</span>
             </div>
+            {% for song in songs %}
+                <div class="results">
+                    <div class="tags">
+                        <div class="songTag">
+                            <div class="songTagBox">
+                                <img src="/static/images/musicSymbol.svg" class="musicSymbol">
+                                <span>SONG:</span>
+                            </div>
+                            <span class="tagLabel">{{song.filename}}</span>
+                        </div>
+                        <div class="genreTag">
+                            <div class="genreTagBox">
+                                <img src="/static/images/recordSymbol.svg" class="recordSymbol">
+                                <span>GENRE:</span>
+                            </div>
+                            <span class="tagLabel">{{song.primaryGenre}}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
 
     </body>
