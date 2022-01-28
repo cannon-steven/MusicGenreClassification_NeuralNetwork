@@ -23,4 +23,30 @@ def main_web_page():
 
 
 # --- BACKEND API ---
+@app.route("/songs", methods=["POST"])
+def upload_song():
+    # Check that a file is present
+    if 'file' not in request.files:
+        return {"error": "Expected a .wav file"}, 400
 
+    # Verify file extension
+    file = request.files["file"]
+    if not is_allowed_file(file.filename):  # file.filename = "example.wav"
+        return {"error": "Expected a .wav file"}, 400
+
+    # Send file to the model
+    genreResults = predict_genre(file)
+
+    return Response(
+                    response=jsonify({
+                                        "filename": file,
+                                        "genre": genreResults
+                                    }),
+                    status=201,  # Maybe use 202? Depends on processing time
+                    content_type="application/json"
+                    )
+
+
+# --- Testing Stubs ---
+def predict_genre(file):
+    return jsonify({"rock": 80, "pop": 20})
