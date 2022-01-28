@@ -65,17 +65,18 @@ def get_songs():
             }
         },
         {
-            "filename": "beat_it.mp3",
+            "filename": "bad.mp3",
             "genre": {
-                "rock": 80,
-                "pop": 20
+                "rock": 75,
+                "pop": 25
             }
         },
         {
-            "filename": "beat_it.mp3",
+            "filename": "thriller.mp3",
             "genre": {
                 "rock": 80,
-                "pop": 20
+                "pop": 20,
+                "spooks": 100
             }
         }
     ]
