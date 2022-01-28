@@ -81,3 +81,7 @@
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 2em;
 }
+
+.hidden {
+    display: none;
+}
