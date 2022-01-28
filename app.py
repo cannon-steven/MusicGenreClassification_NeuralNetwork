@@ -9,6 +9,7 @@ app = Flask(__name__)
 # --- HELPER FUNCTIONS ---
 # https://flask.palletsprojects.com/en/2.0.x/patterns/fileuploads/
 def is_allowed_file(filename):
+    """Returns True/False if a given file ends with an allowed extension"""
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
