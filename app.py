@@ -28,7 +28,9 @@ def main_web_page():
 def upload_song():
     # Check that a file is present
     if 'file' not in request.files:
-        return {"error": "Expected a .wav file"}, 400
+        return {"error":    "No file, or form input unnamed."
+                            + " Expected a .wav file input named 'file'"
+                }, 400
 
     # Verify file extension
     file = request.files["file"]
