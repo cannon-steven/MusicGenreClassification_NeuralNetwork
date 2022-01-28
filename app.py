@@ -13,6 +13,16 @@ def is_allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+def getMax(dict):
+    """Finds the element in a dictionary whose value is the greatest"""
+    max = None
+    for element in dict:
+        if dict[element] > dict[max]:
+            max = element
+
+    return max
+
+
 # --- WEB PAGES ---
 @app.route("/")
 def start():
