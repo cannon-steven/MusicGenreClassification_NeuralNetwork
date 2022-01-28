@@ -20,7 +20,10 @@ def start():
 
 @app.route("/main")
 def main_web_page():
-    return render_template('main.html')
+    content = get_songs()
+    return render_template('main.html', **content)
+    # The ** operator turns a dictionary into keyword arguments.
+    # {'example': 'data', 'ex2': 'data'} -> example='data', ex2='data'
 
 
 # --- BACKEND API ---
@@ -56,27 +59,29 @@ def predict_genre(file):
 
 
 def get_songs():
-    return [
-        {
-            "filename": "beat_it.mp3",
-            "genre": {
-                "rock": 80,
-                "pop": 20
+    return {
+        "songs": [
+            {
+                "filename": "beat_it.mp3",
+                "genre": {
+                    "rock": 80,
+                    "pop": 20
+                }
+            },
+            {
+                "filename": "bad.mp3",
+                "genre": {
+                    "rock": 75,
+                    "pop": 25
+                }
+            },
+            {
+                "filename": "thriller.mp3",
+                "genre": {
+                    "rock": 80,
+                    "pop": 20,
+                    "spooks": 100
+                }
             }
-        },
-        {
-            "filename": "bad.mp3",
-            "genre": {
-                "rock": 75,
-                "pop": 25
-            }
-        },
-        {
-            "filename": "thriller.mp3",
-            "genre": {
-                "rock": 80,
-                "pop": 20,
-                "spooks": 100
-            }
-        }
-    ]
+        ]
+    }
