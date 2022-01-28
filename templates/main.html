@@ -19,6 +19,11 @@
             <div id="lowerMenu">
                 <span>Songs</span>
                 <div id="songsBox">
+                    <ul>
+                        {% for song in songs %}
+                            <li>{{song.filename}}</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
