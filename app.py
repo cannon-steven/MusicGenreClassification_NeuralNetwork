@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 
 # --- HELPER FUNCTIONS ---
+# https://flask.palletsprojects.com/en/2.0.x/patterns/fileuploads/
 def is_allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -53,7 +54,7 @@ def upload_song():
                     )
 
 
-# --- Testing Stubs ---
+# --- TESTING STUBS ---
 def predict_genre(file):
     return {"rock": 80, "pop": 20}
 
@@ -62,21 +63,21 @@ def get_songs():
     return {
         "songs": [
             {
-                "filename": "beat_it.mp3",
+                "filename": "beat_it.wav",
                 "genre": {
                     "rock": 80,
                     "pop": 20
                 }
             },
             {
-                "filename": "bad.mp3",
+                "filename": "bad.wav",
                 "genre": {
                     "rock": 75,
                     "pop": 25
                 }
             },
             {
-                "filename": "thriller.mp3",
+                "filename": "thriller.wav",
                 "genre": {
                     "rock": 80,
                     "pop": 20,
