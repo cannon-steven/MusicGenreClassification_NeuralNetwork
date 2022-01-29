@@ -24,7 +24,7 @@
                 <div id="songsBox">
                     <ul>
                         {% for song in songs %}
-                            <li>{{song.filename}}</li>
+                            <li id="{{song.filename}}_li" class="songList">{{song.filename}}</li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -37,7 +37,7 @@
                 <span>Select a song to see our predictions</span>
             </div>
             {% for song in songs %}
-                <div class="results hidden">
+                <div class="results" id="{{song.filename}}_results" style="display: none;">
                     <div class="tags">
                         <div class="songTag">
                             <div class="songTagBox">
