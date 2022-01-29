@@ -1,18 +1,6 @@
-@font-face {
-    font-family: MochiyPopPOne;
-    src: url(/static/fonts/MochiyPopPOne-Regular.ttf);
-}
-
-html {
-    height: 100%;
-}
-
 body {
-    height: 100%;
-    width: 100%;
     display: flex;
     flex-direction: row;
-    margin: 0;
 }
 
 #leftSide {
@@ -41,8 +29,6 @@ body {
 }
 
 #text {
-    font-family: MochiyPopPOne, Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 32px;
     display: flex;
     flex-direction: column;
     align-items: center;
