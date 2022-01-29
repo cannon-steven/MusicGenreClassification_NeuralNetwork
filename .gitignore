@@ -1,3 +1,6 @@
 env
 .idea
 .env
+venv
+.vscode
+__pycache__
