@@ -39,20 +39,23 @@
             {% for song in songs %}
                 <div class="results" id="{{song.filename}}_results" style="display: none;">
                     <div class="tags">
-                        <div class="songTag">
-                            <div class="songTagBox">
-                                <img src="/static/images/musicSymbol.svg" class="musicSymbol">
+                        <div class="tag">
+                            <div class="tagBox">
+                                <img src="/static/images/musicSymbol.svg" class="tagSymbol">
                                 <span>SONG:</span>
                             </div>
                             <span class="tagLabel">{{song.filename}}</span>
                         </div>
-                        <div class="genreTag">
-                            <div class="genreTagBox">
-                                <img src="/static/images/recordSymbol.svg" class="recordSymbol">
+                        <div class="tag">
+                            <div class="tagBox">
+                                <img src="/static/images/recordSymbol.svg" class="tagSymbol">
                                 <span>GENRE:</span>
                             </div>
                             <span class="tagLabel">{{song.primaryGenre}}</span>
                         </div>
+                    </div>
+                    <div class="charts">
+
                     </div>
                 </div>
             {% endfor %}
