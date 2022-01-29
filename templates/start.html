@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <script src="/static/js/start.js"></script>
+    <link rel="stylesheet" href="/static/css/general.css">
     <link rel="stylesheet" href="/static/css/start.css">
     <body>
         <div id="leftSide">
@@ -21,12 +22,12 @@
                 src="/static/images/UploadSymbol.svg" 
                 onclick="uploadFile()"
             >
-            <div id="text">
+            <div id="text" class="mochiyFont">
                 <div>Upload a Song</div>
                 <div>We'll guess the Genre</div>
             </div>
-            <form action="/songs" method="POST">
-                <input id="upload" type="file" accept=".mp3" style="display:none;" onchange="this.form.submit()">
+            <form action="/songs" method="POST" enctype="multipart/form-data">
+                <input id="upload" type="file" name = "file" accept=".wav" style="display:none;" onchange="this.form.submit()">
             </form>
         </div>  
     </body>

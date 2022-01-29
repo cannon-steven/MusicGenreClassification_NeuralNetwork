@@ -1,0 +1,20 @@
+@font-face {
+    font-family: MochiyPopPOne;
+    src: url(/static/fonts/MochiyPopPOne-Regular.ttf);
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.mochiyFont {
+    font-family: MochiyPopPOne, Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 32px;
+}
