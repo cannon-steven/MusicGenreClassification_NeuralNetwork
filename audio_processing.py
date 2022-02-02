@@ -18,9 +18,8 @@ def make_dataset(header):
         writer.writerow(header)
     # These are the genres in the GTZAN directories
     # and we are going to loop through those directories to get the wav files.
-    genres = 'blues classical country disco'
-    'hiphop jazz metal pop reggae rock'.split()
-    for g in genres:
+    genres = "blues classical country disco hiphop jazz metal pop reggae rock"
+    for g in genres.split():
         # loop through the genres directory
         # and pick the wav file from each genre directory
         for filename in os.listdir(f'./genres/{g}'):
@@ -38,14 +37,16 @@ def make_dataset(header):
             spec_bw = librosa.feature.spectral_bandwidth(y=y, sr=sr)
             # spectral rolloff
             rolloff = librosa.feature.spectral_rolloff(y=y, sr=sr)
-            # zero crossing rate 
+            # zero crossing rate
             zcr = librosa.feature.zero_crossing_rate(y)
             # The Mel-Frequency Cepstral Coefficients (21 in our case)
             mfcc = librosa.feature.mfcc(y=y, sr=sr)
-            # take the mean of each attribute and append it as a string
-            to_append = f'{filename} {np.mean(chroma_stft)} {np.mean(rmse)}'
-            '{np.mean(spec_cent)} {np.mean(spec_bw)} {np.mean(rolloff)}'
-            '{np.mean(zcr)}'
+            # take the mean of each parameter (except filename)
+            # and append it as a string
+            to_append = f'{filename} {np.mean(chroma_stft)}'
+            to_append = f'{np.mean(rmse)} {np.mean(spec_cent)}'
+            to_append = f'{np.mean(spec_bw)} {np.mean(rolloff)} {np.mean(zcr)}'
+
             # loop through all the mfcc values and append them
             # together to add them on the to_append variable
             for e in mfcc:
@@ -63,8 +64,8 @@ def init_dataset_header():
     Initializes the header for the data.csv file.
     Uses the make_dataset() function to generate the data.csv file.
     '''
-    header = 'filename chroma_stft '
-    'rmse spectral_centroid spectral_bandwidth rolloff zero_crossing_rate'
+    header = '''filename chroma_stft rmse spectral_centroid
+    spectral_bandwidth rolloff zero_crossing_rate'''
 
     # I need to generate 21 columns in the csv file for the mfcc values
     for i in range(1, 21):
