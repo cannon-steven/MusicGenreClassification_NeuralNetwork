@@ -96,12 +96,14 @@ def get_random_track(genre):
     rand_string = gen_rand_track_string()
 
     # Query Parameters at end of URL: ?q=songname&type=track   etc.
+    # genre has to be part of q instead of own parameter
+    # https://developer.spotify.com/documentation/web-api/reference/#/
+    # operations/search   (2 lines)
     queryParams = {
-        "q": rand_string,
-        "genre": genre,
+        "q": f"{rand_string} genre:{genre}",
         "type": "track",
-        "offset": 10, # random.randint(0, 999),
-        "limit": 1
+        "offset": random.randint(0, 999),
+        "limit": 10
     }
 
     # Send API key in HTTP header
@@ -124,10 +126,12 @@ def get_random_track(genre):
         return {"trackName": trackName, "trackID": trackID}
 
     except:
-        return {"error": "something went wrong with the request"}
+        return {
+            "error": "Something went wrong with the request." +
+                     "It is likely the genre was not recognized"}
 
 
-print(get_random_track("pop"))
+print(get_random_track("rock"))
 
 # A song ID on spotify. TODO: Add way to get random track IDs
 # trackID = "2TpxZ7JUBn3uw46aR7qd6V"
