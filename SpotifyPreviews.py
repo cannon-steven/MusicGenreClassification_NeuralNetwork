@@ -132,15 +132,39 @@ def get_random_track(genre):
             "error": "Something went wrong with the request." +
                      "It is likely the genre was not recognized"}
 
-print(get_random_track("rap"))
+exTrackID = "0DLOyyQvwPTSDKuhpzMMwA" # TODO: FOR TESTING - REMOVE THIS
 
-def get_preview(preview_url):
-    """Given the """
-    # Request the 30 second preview
-    previewResponse = requests.get(preview_url)
 
-    # Save song as mp3 file
-    # TODO: Add naming scheme for multiple files
-    # TODO: Convert mp3 to wav
-    with open("track.mp3", "wb") as f:
-        f.write(previewResponse.content)
+def get_preview_URL(trackID):
+    """
+    Given the spotify ID of a track, returns the URL for a 30 second preview
+    """
+    # Set request header to include developer key
+    headers = {
+        'Authorization': f"Bearer {TOKEN}"
+    }
+    # Send request
+    trackData = requests.get(
+        f"{API_URL}/tracks/{trackID}", 
+        headers=headers
+    )
+
+    # Get 30 second song preview URL from the response
+    previewURL = trackData.json()["preview_url"]
+
+    return previewURL
+
+def get_wav(preview_URL):
+    """
+    Given a spotify preview URL, returns a .wav file
+    """
+print(get_preview_URL(exTrackID))
+    
+    # # Request the 30 second preview
+    # previewResponse = requests.get(preview_url)
+
+    # # Save song as mp3 file
+    # # TODO: Add naming scheme for multiple files
+    # # TODO: Convert mp3 to wav
+    # with open("track.mp3", "wb") as f:
+    #     f.write(previewResponse.content)
