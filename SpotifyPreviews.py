@@ -55,6 +55,24 @@ TOKEN = get_developer_key()
 
 
 # --- GET SONGS ---
+
+def get_genres():
+    """
+    Requests genres from the spotify API and returns a list of available genres
+    """
+    # Send API key in HTTP header
+    headers = {
+        "Authorization": f"Bearer {TOKEN}"
+    }
+
+    genreData = requests.get(
+        f"{API_URL}/recommendations/available-genre-seeds",
+        headers=headers
+    )
+
+    return genreData.json()["genres"]
+
+
 # https://perryjanssen.medium.com/getting-random-tracks-using-the-spotify
 # -api-61889b0c0c27      (link is both lines)
 def gen_rand_track_string():
@@ -71,17 +89,18 @@ def gen_rand_track_string():
 
 def get_random_track(genre):
     """
-    Calls the Spotify API to get the name and spotify ID for a random song
+    Calls the Spotify API to get the name and spotify ID for a random song in a
+    specific genre
     """
     # Get a random song to search for
     rand_string = gen_rand_track_string()
 
     # Query Parameters at end of URL: ?q=songname&type=track   etc.
     queryParams = {
-        "genre": genre,
         "q": rand_string,
+        "genre": genre,
         "type": "track",
-        "offset": random.randint(0, 999),
+        "offset": 10, # random.randint(0, 999),
         "limit": 1
     }
 
@@ -90,21 +109,25 @@ def get_random_track(genre):
         "Authorization": f"Bearer {TOKEN}"
     }
 
-    # Get track data from Spotify API
-    trackData = requests.get(
-        f"{API_URL}/search",
-        params=queryParams,
-        headers=headers
-    )
+    try:
+        # Get track data from Spotify API
+        trackData = requests.get(
+            f"{API_URL}/search",
+            params=queryParams,
+            headers=headers
+        )
 
-    # Parse response for Name and ID
-    trackName = trackData.json()["tracks"]["items"][0]["name"]
-    trackID = trackData.json()["tracks"]["items"][0]["id"]
+        # Parse response for Name and ID
+        trackName = trackData.json()["tracks"]["items"][0]["name"]
+        trackID = trackData.json()["tracks"]["items"][0]["id"]
 
-    return {"trackName": trackName, "trackID": trackID}
+        return {"trackName": trackName, "trackID": trackID}
+
+    except:
+        return {"error": "something went wrong with the request"}
 
 
-print(get_random_track("rock"))
+print(get_random_track("pop"))
 
 # A song ID on spotify. TODO: Add way to get random track IDs
 # trackID = "2TpxZ7JUBn3uw46aR7qd6V"
