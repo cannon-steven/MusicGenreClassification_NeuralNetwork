@@ -78,6 +78,7 @@ def get_random_track(genre):
 
     # Query Parameters at end of URL: ?q=songname&type=track   etc.
     queryParams = {
+        "genre": genre,
         "q": rand_string,
         "type": "track",
         "offset": random.randint(0, 999),
@@ -103,7 +104,7 @@ def get_random_track(genre):
     return {"trackName": trackName, "trackID": trackID}
 
 
-get_random_track()
+print(get_random_track("rock"))
 
 # A song ID on spotify. TODO: Add way to get random track IDs
 # trackID = "2TpxZ7JUBn3uw46aR7qd6V"
