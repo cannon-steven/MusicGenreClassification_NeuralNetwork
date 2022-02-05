@@ -11,7 +11,7 @@ import soundfile as sf
 # https://prettystatic.com/automate-the-spotify-api-with-python/
 
 # Given when registered with spotify developer API
-# THESE SHOULD BE MOVED TO .env
+# TODO: THESE SHOULD BE MOVED TO .env
 CLIENT_ID = "d8d312f35e424b11857344f323971ad6"
 CLIENT_SECRET = "7924f51c9b7748b383b6359ae325d23b"
 
@@ -19,9 +19,6 @@ CLIENT_SECRET = "7924f51c9b7748b383b6359ae325d23b"
 AUTH_URL = "https://accounts.spotify.com/api/token"
 # Primary API URL
 API_URL = "https://api.spotify.com/v1"
-
-# Developer Key
-TOKEN = "BQDxiKy3yfv7ya-bkWZ9M1YbfXIMCFNrz6iuMiQyMxHTyuYGFyqqSNNJxOeGDZl2xVj_5Yu8c1ATltBjNJI"
 
 
 # --- GET DEVELOPER KEY ---
@@ -56,8 +53,11 @@ def get_developer_key():
     return token
 
 
-# --- GET SONGS ---
+# API keys expire, so it is helpful to generate new ones each time
+TOKEN = get_developer_key()
 
+
+# --- GET SONGS ---
 def get_genres():
     """
     Requests genres from the spotify API and returns a list of available genres
@@ -132,7 +132,8 @@ def get_random_track(genre):
             "error": "Something went wrong with the request." +
                      "It is likely the genre was not recognized"}
 
-exTrackID = "0DLOyyQvwPTSDKuhpzMMwA" # TODO: FOR TESTING - REMOVE THIS
+
+exTrackID = "0oPdaY4dXtc3ZsaG17V972"  # TODO: FOR TESTING - REMOVE THIS
 
 
 def get_preview_URL(trackID):
@@ -177,6 +178,7 @@ def extract_features(wavFile):
         mfcc20: data
     }
     """
+    features = dict()
 
 
 def format_csvData(name, featureData, label):
@@ -186,6 +188,21 @@ def format_csvData(name, featureData, label):
     Format: "filename,chroma_stft,rmse,spectral_centroid,
     spectral_bandwidth,rolloff,zero_crossing_rate,mfcc1,...,mfcc20,label"
     """
+    mfccString = ""
+    for i in range(1, 21):  # mfcc1 to mfcc20
+        mfccString.append(featureData[f"mfcc{i},"])
+
+    csvString = f"{name}"\
+                + f"{featureData['chroma_stft']},"\
+                + f"{featureData['rmse']},"\
+                + f"{featureData['spectral_centroid']},"\
+                + f"{featureData['spectral_bandwidth']},"\
+                + f"{featureData['rolloff']},"\
+                + f"{featureData['zero_crossing_rate']},"\
+                + f"{mfccString}"\
+                + f"{label}"
+
+    return csvString
 
 
 def append_data(dataString, csvFile="song_data.csv"):
@@ -196,13 +213,13 @@ def append_data(dataString, csvFile="song_data.csv"):
     spectral_bandwidth,rolloff,zero_crossing_rate,mfcc1,...,mfcc20,label"
     """
 
-print(get_preview_URL(exTrackID))
+# # print(get_preview_URL(exTrackID))
     
-    # # Request the 30 second preview
-    # previewResponse = requests.get(preview_url)
+# # Request the 30 second preview
+# previewResponse = requests.get("https://p.scdn.co/mp3-preview/5bd22befb5bd4b407a3a4de2a5947a1fb3d53ff6?cid=d8d312f35e424b11857344f323971ad6")
 
-    # # Save song as mp3 file
-    # # TODO: Add naming scheme for multiple files
-    # # TODO: Convert mp3 to wav
-    # with open("track.mp3", "wb") as f:
-    #     f.write(previewResponse.content)
+# # Save song as mp3 file
+# # TODO: Add naming scheme for multiple files
+# # TODO: Convert mp3 to wav
+# with open("FelizNavidad.mp3", "wb") as f:
+#     f.write(previewResponse.content)
