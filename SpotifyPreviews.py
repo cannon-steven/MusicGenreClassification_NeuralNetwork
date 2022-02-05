@@ -1,6 +1,8 @@
 import requests
 import base64
 import random
+import librosa
+import numpy as np
 import soundfile as sf
 
 # Information about client credential flow here (2 lines):
@@ -163,13 +165,14 @@ def get_wav(preview_URL):
     """
 
 
-def extract_features(wavFile):
+def extract_features(wavFilePath):
     """
-    Given a .wav file, extracts the data necessary to process the song through
-    the Convolutional Neural Network model. Returns the data as a dictionary
+    Given the path to a .wav file, extracts the data necessary to process the 
+    song through the Convolutional Neural Network model. 
+    Returns the data as a dictionary
     {
         chroma_stft: data,
-        rmse: data,
+        rms: data,
         spectral_centroid: data,
         spectral_bandwidth: data,
         rolloff: data,
@@ -179,14 +182,38 @@ def extract_features(wavFile):
         mfcc20: data
     }
     """
+    # Initialize feature dictionary
     features = dict()
+
+    # Load song as audio time series array
+    timeSeries, sampleRate = librosa.load(wavFilePath, duration=30)
+
+    # Process data and store features in feature dictionary
+    features["chroma_stft"] = \
+        np.mean(librosa.feature.chroma_stft(y=timeSeries))
+    features["rms"] = \
+        np.mean(librosa.feature.rms(y=timeSeries))
+    features["spectral_centroid"] = \
+        np.mean(librosa.feature.spectral_centroid(y=timeSeries))
+    features["spectral_bandwidth"] = \
+        np.mean(librosa.feature.spectral_bandwidth(y=timeSeries))
+    features["rolloff"] = \
+        np.mean(librosa.feature.spectral_rolloff(y=timeSeries))
+    features["zero_crossing_rate"] = \
+        np.mean(librosa.feature.zero_crossing_rate(y=timeSeries))
+    i = 1
+    for coefficient in librosa.feature.mfcc(y=timeSeries):
+        features[f"mfcc{i}"] = coefficient
+        i += 1
+
+    return features
 
 
 def format_csvData(name, featureData, label):
     """
     Formats data into a string to be added to a CSV file.
 
-    Format: "filename,chroma_stft,rmse,spectral_centroid,
+    Format: "filename,chroma_stft,rms,spectral_centroid,
     spectral_bandwidth,rolloff,zero_crossing_rate,mfcc1,...,mfcc20,label"
     """
     mfccString = ""
@@ -195,7 +222,7 @@ def format_csvData(name, featureData, label):
 
     csvString = f"{name}"\
                 + f"{featureData['chroma_stft']},"\
-                + f"{featureData['rmse']},"\
+                + f"{featureData['rms']},"\
                 + f"{featureData['spectral_centroid']},"\
                 + f"{featureData['spectral_bandwidth']},"\
                 + f"{featureData['rolloff']},"\
@@ -210,7 +237,7 @@ def append_data(dataString, csvFile="song_data.csv"):
     """
     Given a string, appends it to the end of a csv file.
 
-    expected format: "filename,chroma_stft,rmse,spectral_centroid,
+    expected format: "filename,chroma_stft,rms,spectral_centroid,
     spectral_bandwidth,rolloff,zero_crossing_rate,mfcc1,...,mfcc20,label"
     """
     with open(csvFile, 'a', newline="") as file:
