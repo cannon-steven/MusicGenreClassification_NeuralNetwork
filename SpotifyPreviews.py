@@ -154,10 +154,48 @@ def get_preview_URL(trackID):
 
     return previewURL
 
+
 def get_wav(preview_URL):
     """
     Given a spotify preview URL, returns a .wav file
     """
+
+
+def extract_features(wavFile):
+    """
+    Given a .wav file, extracts the data necessary to process the song through
+    the Convolutional Neural Network model. Returns the data as a dictionary
+    {
+        chroma_stft: data,
+        rmse: data,
+        spectral_centroid: data,
+        spectral_bandwidth: data,
+        rolloff: data,
+        zero_crossing_rate: data,
+        mfcc1: data,
+        ...
+        mfcc20: data
+    }
+    """
+
+
+def format_csvData(name, featureData, label):
+    """
+    Formats data into a string to be added to a CSV file.
+
+    Format: "filename,chroma_stft,rmse,spectral_centroid,
+    spectral_bandwidth,rolloff,zero_crossing_rate,mfcc1,...,mfcc20,label"
+    """
+
+
+def append_data(dataString, csvFile="song_data.csv"):
+    """
+    Given a string, appends it to the end of a csv file.
+
+    expected format: "filename,chroma_stft,rmse,spectral_centroid,
+    spectral_bandwidth,rolloff,zero_crossing_rate,mfcc1,...,mfcc20,label"
+    """
+
 print(get_preview_URL(exTrackID))
     
     # # Request the 30 second preview
