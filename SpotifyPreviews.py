@@ -158,7 +158,8 @@ def get_preview_URL(trackID):
 
 def get_wav(preview_URL):
     """
-    Given a spotify preview URL, returns a .wav file
+    Given a spotify preview URL, downloads it as a .wav file and returns the
+    path to the file
     """
 
 
