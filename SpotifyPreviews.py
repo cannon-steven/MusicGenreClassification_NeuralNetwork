@@ -212,6 +212,8 @@ def append_data(dataString, csvFile="song_data.csv"):
     expected format: "filename,chroma_stft,rmse,spectral_centroid,
     spectral_bandwidth,rolloff,zero_crossing_rate,mfcc1,...,mfcc20,label"
     """
+    with open(csvFile, 'a', newline="") as file:
+        file.write(dataString)
 
 # # print(get_preview_URL(exTrackID))
     
