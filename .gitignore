@@ -6,3 +6,4 @@ genres
 venv
 .vscode
 data.csv
+song_name.wav
