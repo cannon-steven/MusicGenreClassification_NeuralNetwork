@@ -1,148 +1,85 @@
-import json
-import os
+import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import os
 from sklearn.model_selection import train_test_split
-import tensorflow.keras as keras
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from tensorflow import keras
+from keras.models import Sequential
 
 # to avoid Tensorflow startup messages in terminal
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 
-DATA_PATH = "metadata.json"
+
+def trainModel(model, optimizer, X_train, y_train, X_test, y_test):
+    batch_size = 128
+    model.compile(optimizer=optimizer,
+                  loss='sparse_categorical_crossentropy',
+                  metrics='accuracy')
 
 
-def load_data(data_path):
-
-    with open(data_path, "r") as fp:
-        data = json.load(fp)
-
-    X = np.array(data["mfcc"])
-    y = np.array(data["labels"])
-    return X, y
+    return model.fit(X_train, y_train, validation_data=(X_test, y_test),
+                     batch_size=batch_size, epochs=600, verbose=1)
 
 
-def prepare_datasets(test_size, validation_size):
-
-    # load data
-    X, y = load_data(DATA_PATH)
-
-    # create train, validation and test datasets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
-    X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=validation_size)
-
-    # add an axis to input sets
-    X_train = X_train[..., np.newaxis]
-    X_validation = X_validation[..., np.newaxis]
-    X_test = X_test[..., np.newaxis]
-
-    return X_train, X_validation, X_test, y_train, y_validation, y_test
+def plotValidate(history):
+    print("Validation Accuracy", max(history.history["val_accuracy"]))
+    pd.DataFrame(history.history).plot(figsize=(12, 6))
+    plt.show()
 
 
-def build_model(input_shape):
 
-    # build network topology
-    model = keras.Sequential()
+def buildModel(X_train):
 
-    # 1st Convolution Layer
-    model.add(keras.layers.Conv2D(filters=128, kernel_size=(3, 3), input_shape=input_shape))
-    # model.add(keras.layers.LeakyReLU(alpha=0.001))
-    model.add(keras.layers.ReLU())
-    model.add(keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding='same'))
-    model.add(keras.layers.BatchNormalization())
+    input_shape = (X_train.shape[1], )
 
-    # 2nd Convolution Layer
-    model.add(keras.layers.Conv2D(filters=128, kernel_size=(3, 3), input_shape=input_shape))
-    # model.add(keras.layers.LeakyReLU(alpha=0.001))
-    model.add(keras.layers.ReLU())
-    model.add(keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding='same'))
-    model.add(keras.layers.BatchNormalization())
+    model = Sequential([
+        keras.layers.Dense(512, activation='relu', input_shape=input_shape),
+        keras.layers.BatchNormalization(),
 
-    # 3rd Convolution Layer
-    model.add(keras.layers.Conv2D(filters=128, kernel_size=(2, 2), input_shape=input_shape))
-    # model.add(keras.layers.LeakyReLU(alpha=0.001))
-    model.add(keras.layers.ReLU())
-    model.add(keras.layers.MaxPooling2D((2, 2), strides=(2, 2), padding='same'))
-    model.add(keras.layers.BatchNormalization())
+        keras.layers.Dense(256, activation='relu'),
+        keras.layers.BatchNormalization(),
 
-    # Flatten and Run Through Dense Layer
-    model.add(keras.layers.Flatten())
-    model.add(keras.layers.Dense(128))
-    model.add(keras.layers.ReLU())
-    # model.add(keras.layers.LeakyReLU(alpha=0.001))
-    model.add(keras.layers.Dropout(0.3))
+        keras.layers.Dense(128, activation='relu'),
+        keras.layers.BatchNormalization(),
 
-    # One Last Dense Layer for Output
-    model.add(keras.layers.Dense(10, activation='softmax'))
+        keras.layers.Dense(64, activation='relu'),
+        keras.layers.Dropout(0.2),
+
+        keras.layers.Dense(10, activation='softmax'),
+    ])
 
     return model
 
 
-# def predict(model, X, y):
-#     """Predict a single sample using the trained model
-#     :param model: Trained classifier
-#     :param X: Input data
-#     :param y (int): Target
-#     """
-#
-#     # add a dimension to input data for sample - model.predict() expects a 4d array in this case
-#     X = X[np.newaxis, ...] # array shape (1, 130, 13, 1)
-#
-#     # perform prediction
-#     prediction = model.predict(X)
-#
-#     # get index with max value
-#     predicted_index = np.argmax(prediction, axis=1)
-#
-#     print("Target: {}, Predicted label: {}".format(y, predicted_index))
+if __name__ == '__main__':
 
 
-if __name__ == "__main__":
+    df = pd.read_csv("features_3_sec.csv")
+    df = df.drop(['filename', 'length'], axis=1)
 
-    # # get train, validation, test splits
-    # X_train, X_validation, X_test, y_train, y_validation, y_test = prepare_datasets(0.25, 0.2)
-    #
-    # # create network
-    # input_shape = (X_train.shape[1], X_train.shape[2], 1)
-    # model = build_model(input_shape)
-    #
-    # # compile model
-    # optimiser = keras.optimizers.Adam(learning_rate=0.001)
-    # model.compile(optimizer=optimiser,
-    #               loss='sparse_categorical_crossentropy',
-    #               metrics=['accuracy'])
-    #
-    # model.summary()
-    #
-    # # early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5)
-    #
-    # # training function
-    # history = model.fit(X_train, y_train, validation_data=(X_validation, y_validation),
-    #                     batch_size=32, epochs=30)
-    #
-    # # saves/persists trained model state
-    # model.save("my_model")
-    #
-    # # # pick a sample to predict from the test set
-    # # X_to_predict = X_test[100]
-    # # y_to_predict = y_test[100]
-    # #
-    # # # # predict sample
-    # # predict(model, X_to_predict, y_to_predict)
-    #
-    # # evaluate model on test set
-    # test_loss, test_accuracy = model.evaluate(X_test, y_test, verbose=2)
-    # print('\nTest accuracy:', test_accuracy)
+    # slice off class list at end of csv and encode for y axis
+    class_list = df.iloc[:, -1]
+    convertor = LabelEncoder()
+    y = convertor.fit_transform(class_list)
+
+    # scale X axis
+    fit = StandardScaler()
+    X = fit.fit_transform(np.array(df.iloc[:, :-1], dtype=float))
+
+    # populate test and train data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.25)
 
 
+    # build and train model
+    model = buildModel(X_train)
+    history = trainModel(model, 'adam', X_train, y_train, X_test, y_test)
 
-    ########################################################################
+    # evaluate model accuracy and display in easy to read format
+    test_loss, test_acc = model.evaluate(X_test, y_test, batch_size=128)
+    print("The test loss is: ", test_loss)
+    print("The test accuracy is: ", test_acc * 100)
 
-
-    # get train, validation, test splits
-    X_train, X_validation, X_test, y_train, y_validation, y_test = prepare_datasets(0.25, 0.2)
-    # print("X Test:")
-    # print(X_test)
-    # print("Y Test:")
-    # print(y_test)
-    # print(type(y_test))
-
+    # save model for later use
+    model.save("my_model")
 
