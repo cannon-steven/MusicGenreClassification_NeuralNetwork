@@ -25,6 +25,10 @@ API_URL = "https://api.spotify.com/v1"
 
 # --- GET DEVELOPER KEY ---
 def get_developer_key():
+    """
+    Get a developer API key from spotify. Required for accessing most of the 
+    API. API keys expire, so a periodic renewal is necessary
+    """
     # Getting a developer key requires sending this info encoded as base64
     b64Message = f"{CLIENT_ID}:{CLIENT_SECRET}"
     b64Message = b64Message.encode('ascii')
@@ -54,19 +58,14 @@ def get_developer_key():
 
     return token
 
-
-# API keys expire, so it is helpful to generate new ones each time
-TOKEN = get_developer_key()
-
-
 # --- GET SONGS ---
-def get_genres():
+def get_genres(apiKey):
     """
     Requests genres from the spotify API and returns a list of available genres
     """
     # Send API key in HTTP header
     headers = {
-        "Authorization": f"Bearer {TOKEN}"
+        "Authorization": f"Bearer {apiKey}"
     }
 
     genreData = requests.get(
@@ -91,7 +90,7 @@ def gen_rand_track_string():
     return f"{letter}%"
 
 
-def get_random_track(genre):
+def get_random_track(genre, apiKey):
     """
     Calls the Spotify API to get the name and spotify ID for a random song in a
     specific genre
@@ -112,7 +111,7 @@ def get_random_track(genre):
 
     # Send API key in HTTP header
     headers = {
-        "Authorization": f"Bearer {TOKEN}"
+        "Authorization": f"Bearer {apiKey}"
     }
 
     try:
@@ -138,13 +137,13 @@ def get_random_track(genre):
 exTrackID = "0oPdaY4dXtc3ZsaG17V972"  # TODO: FOR TESTING - REMOVE THIS
 
 
-def get_preview_URL(trackID):
+def get_preview_URL(trackID, apiKey):
     """
     Given the spotify ID of a track, returns the URL for a 30 second preview
     """
     # Set request header to include developer key
     headers = {
-        'Authorization': f"Bearer {TOKEN}"
+        'Authorization': f"Bearer {apiKey}"
     }
     # Send request
     trackData = requests.get(
@@ -158,14 +157,15 @@ def get_preview_URL(trackID):
     return previewURL
 
 
-def get_wav(preview_URL):
+def temp_download(preview_URL):
     """
-    Given a spotify preview URL, downloads it as a .wav file and returns the
+    Given a spotify preview URL, downloads it as a .mp3 file and returns the
     path to the file
     """
 
 
-def extract_features(wavFilePath):
+
+def extract_features(trackFilePath):
     """
     Given the path to a .wav file, extracts the data necessary to process the 
     song through the Convolutional Neural Network model. 
@@ -186,7 +186,7 @@ def extract_features(wavFilePath):
     features = dict()
 
     # Load song as audio time series array
-    timeSeries, sampleRate = librosa.load(wavFilePath, duration=30)
+    timeSeries, sampleRate = librosa.load(trackFilePath, duration=30)
 
     # Process data and store features in feature dictionary
     features["chroma_stft"] = \
