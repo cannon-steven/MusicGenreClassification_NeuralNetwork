@@ -51,8 +51,6 @@ def buildModel(X_train):
 
 
 if __name__ == '__main__':
-
-
     df = pd.read_csv("features_3_sec.csv")
     df = df.drop(['filename', 'length'], axis=1)
 
@@ -67,7 +65,6 @@ if __name__ == '__main__':
 
     # populate test and train data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.25)
-
 
     # build and train model
     model = buildModel(X_train)
