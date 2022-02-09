@@ -17,7 +17,6 @@ def trainModel(model, optimizer, X_train, y_train, X_test, y_test):
                   loss='sparse_categorical_crossentropy',
                   metrics='accuracy')
 
-
     return model.fit(X_train, y_train, validation_data=(X_test, y_test),
                      batch_size=batch_size, epochs=600, verbose=1)
 
@@ -26,7 +25,6 @@ def plotValidate(history):
     print("Validation Accuracy", max(history.history["val_accuracy"]))
     pd.DataFrame(history.history).plot(figsize=(12, 6))
     plt.show()
-
 
 
 def buildModel(X_train):
@@ -77,9 +75,11 @@ if __name__ == '__main__':
 
     # evaluate model accuracy and display in easy to read format
     test_loss, test_acc = model.evaluate(X_test, y_test, batch_size=128)
+
     print("The test loss is: ", test_loss)
     print("The test accuracy is: ", test_acc * 100)
 
-    # save model for later use
-    model.save("my_model")
+    plotValidate(history)
 
+    # # save model for later use (uncomment only when you want to create a new model
+    # model.save("my_model")
