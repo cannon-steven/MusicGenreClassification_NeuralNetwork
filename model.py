@@ -22,7 +22,6 @@ def trainModel(model, optimizer, X_train, y_train, X_test, y_test):
 
 
 def plotValidate(history):
-    print("Validation Accuracy", max(history.history["val_accuracy"]))
     pd.DataFrame(history.history).plot(figsize=(12, 6))
     plt.show()
 
