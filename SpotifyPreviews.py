@@ -34,7 +34,7 @@ CSV_HEADERS = "filename,chroma_stft,rmse,spectral_centroid,"\
 # --- GET DEVELOPER KEY ---
 def get_developer_key():
     """
-    Get a developer API key from spotify. Required for accessing most of the 
+    Get a developer API key from spotify. Required for accessing most of the
     API. API keys expire, so a periodic renewal is necessary
     """
     # Getting a developer key requires sending this info encoded as base64
@@ -151,7 +151,7 @@ def get_preview_URL(trackID, apiKey):
     }
     # Send request
     trackData = requests.get(
-        f"{API_URL}/tracks/{trackID}", 
+        f"{API_URL}/tracks/{trackID}",
         headers=headers
     )
 
@@ -185,8 +185,8 @@ def temp_download(preview_url):
 
 def extract_features(trackFilePath):
     """
-    Given the path to a .wav file, extracts the data necessary to process the 
-    song through the Convolutional Neural Network model. 
+    Given the path to a .wav file, extracts the data necessary to process the
+    song through the Convolutional Neural Network model.
     Returns the data as a dictionary
     {
         chroma_stft: data,
@@ -272,19 +272,21 @@ def matching_headers(filepath):
         else:
             return False
 
+
 def add_headers(filepath):
     """Adds headers to csv file. Overwrites file if not empty"""
     with open(filepath, "w") as file:
         file.write(CSV_HEADERS)
 
+
 def confirm_file(filepath):
     """Check with the user that they are using the correct file"""
     if os.path.exists(filepath):
         print(f"The chosen file '{filepath}' already exists. What would you"
-              +" like to do?"
-              +"1. Overwrite file\n"
-              +"2. Add to file\n"
-              +"3. Quit\n")
+              + " like to do?"
+              + "1. Overwrite file\n"
+              + "2. Add to file\n"
+              + "3. Quit\n")
         choice = 0
         while choice not in [1, 2, 3]:
             choice = int(input("Option: "))
@@ -293,9 +295,9 @@ def confirm_file(filepath):
         elif choice == 2:
             if not matching_headers(filepath):
                 print("The headers for the selected file do not match. "
-                    + "Would you like to continue?\n"
-                    + "1. Yes\n"
-                    + "2. No\n")
+                      + "Would you like to continue?\n"
+                      + "1. Yes\n"
+                      + "2. No\n")
                 choice2 = 0
                 while choice2 not in [1, 2]:
                     choice2 = int(input("Option: "))
@@ -388,7 +390,7 @@ def get_tracksData(genre, quantity, apiKey):
 
     return parsed_data
 
-    
+
 def collect_spotify_data(genres, quantity, outputfile="track_features.csv"):
     """
     Gets audio clips from spotify, processes them to extract feature data, and
@@ -397,7 +399,7 @@ def collect_spotify_data(genres, quantity, outputfile="track_features.csv"):
         quantity [int]  - The number of songs per genre to collect data for
         file [string]   - The relative path to a csv file to store the data in
 
-    """ 
+    """
     # Loop through genres and append feature data to file
     for genre in genres:
         tracksData = get_tracksData(genre, quantity)
@@ -406,14 +408,3 @@ def collect_spotify_data(genres, quantity, outputfile="track_features.csv"):
             features = extract_features(soundclip)
             csvString = format_csvData(track["name"], features, genre)
             append_data(csvString, outputfile)
-
-# # print(get_preview_URL(exTrackID))
-    
-# # Request the 30 second preview
-# previewResponse = requests.get("https://p.scdn.co/mp3-preview/5bd22befb5bd4b407a3a4de2a5947a1fb3d53ff6?cid=d8d312f35e424b11857344f323971ad6")
-
-# # Save song as mp3 file
-# # TODO: Add naming scheme for multiple files
-# # TODO: Convert mp3 to wav
-# with open("FelizNavidad.mp3", "wb") as f:
-#     f.write(previewResponse.content)
