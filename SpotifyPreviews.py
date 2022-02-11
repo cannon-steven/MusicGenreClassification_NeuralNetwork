@@ -138,9 +138,7 @@ def get_random_trackID(genre, apiKey):
         return {"trackName": trackName, "trackID": trackID}
 
     except:
-        return {
-            "error": "Something went wrong with the request." +
-                     "It is likely the genre was not recognized"}
+        return {"error": "Something went wrong with the request."}
 
 
 def get_preview_URL(trackID, apiKey):
@@ -158,9 +156,9 @@ def get_preview_URL(trackID, apiKey):
     )
 
     # Get 30 second song preview URL from the response
-    previewURL = trackData.json()["preview_url"]
+    preview_url = trackData.json()["preview_url"]
 
-    return previewURL
+    return preview_url
 
 
 def mp3_to_wav(mp3FilePath):
@@ -178,7 +176,7 @@ def mp3_to_wav(mp3FilePath):
     return wavFilePath
 
 
-def temp_download(previewURL):
+def temp_download(preview_url):
     """
     Given a spotify preview URL, downloads it as a .wav file and returns the
     path to the file
@@ -306,6 +304,91 @@ def confirm_file(filepath):
         elif choice == 3:
             sys.exit()
 
+
+def get_tracksData(genre, quantity, apiKey):
+    """
+    genre [string]  - The genre of music to get tracks for
+    quantity [int]  - The number of tracks to get.
+
+    Returns a dictionary of tracks from spotify in the format
+    {
+        {
+            "name": "A song",
+            "preview_url": "http://someurl.com/12345"
+        }
+    }
+    """
+    # Prepare search parameters
+    limit = 50
+    if quantity < 50:
+        limit = quantity
+
+    queryParams = {
+        "q": f"{genre}",
+        "type": "track",
+        "offset": 0,
+        "limit": f"{limit}"
+    }
+
+    # Send API key in HTTP header
+    headers = {
+        "Authorization": f"Bearer {apiKey}"
+    }
+
+    try:
+        # Get track data from Spotify search API
+        trackData = requests.get(
+            f"{API_URL}/search",
+            params=queryParams,
+            headers=headers
+        )
+        # Parse for name and preview URL and add to list
+        parsed_data = []
+        for track in trackData.json()["tracks"]["items"]:
+            parsed_data.append(
+                {
+                    "name": track["name"],
+                    "preview_url": track["preview_url"]
+                }
+            )
+
+        # Get next seach link (APIs typically return a limited list of items
+        # along with a link to the next set)
+        nextURL = trackData.json()["tracks"]["next"]
+
+    except:
+        return {"error": "Something went wrong with the request."}
+
+    # Get more tracks until specified quantity reached TODO: Implementation
+    # only works with multiples of 50. Update to accept other numbers?
+    quantity -= 50
+    while quantity >= 50:
+        try:
+            # Send API key in HTTP header
+            headers = {
+                "Authorization": f"Bearer {apiKey}"
+            }
+
+            # Get next set of 50 tracks
+            trackData = requests.get(
+                nextURL,
+                headers=headers
+            )
+            for track in trackData.json()["tracks"]["items"]:
+                parsed_data.append(
+                    {
+                        "name": track["name"],
+                        "preview_url": track["preview_url"]
+                    }
+                )
+            quantity -= 50
+
+        except:
+            return {"error": "Something went wrong with the request."}
+
+    return parsed_data
+
+    
 def collect_spotify_data(genres, quantity, outputfile="track_features.csv"):
     """
     Gets audio clips from spotify, processes them to extract feature data, and
@@ -319,7 +402,7 @@ def collect_spotify_data(genres, quantity, outputfile="track_features.csv"):
     for genre in genres:
         tracksData = get_tracksData(genre, quantity)
         for track in tracksData:
-            soundclip = temp_download(track["previewURL"])
+            soundclip = temp_download(track["preview_url"])
             features = extract_features(soundclip)
             csvString = format_csvData(track["name"], features, genre)
             append_data(csvString, outputfile)
