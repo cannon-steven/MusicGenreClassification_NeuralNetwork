@@ -3,7 +3,9 @@ import base64
 import random
 import librosa
 import numpy as np
-import soundfile as sf
+import os
+import sys
+from pydub import AudioSegment
 
 # Information about client credential flow here (2 lines):
 # https://developer.spotify.com/documentation/general/guides/authorization/
@@ -21,6 +23,12 @@ CLIENT_SECRET = "7924f51c9b7748b383b6359ae325d23b"
 AUTH_URL = "https://accounts.spotify.com/api/token"
 # Primary API URL
 API_URL = "https://api.spotify.com/v1"
+
+CSV_HEADERS = "filename,chroma_stft,rmse,spectral_centroid,"\
+            + "spectral_bandwidth,rolloff,zero_crossing_rate,mfcc1,mfcc2,"\
+            + "mfcc3,mfcc4,mfcc5,mfcc6,mfcc7,mfcc8,mfcc9,mfcc10,mfcc11,"\
+            + "mfcc12,mfcc13,mfcc14,mfcc15,mfcc16,mfcc17,mfcc18,mfcc19,"\
+            + "mfcc20,label"
 
 
 # --- GET DEVELOPER KEY ---
@@ -58,6 +66,7 @@ def get_developer_key():
 
     return token
 
+
 # --- GET SONGS ---
 def get_genres(apiKey):
     """
@@ -90,7 +99,7 @@ def gen_rand_track_string():
     return f"{letter}%"
 
 
-def get_random_track(genre, apiKey):
+def get_random_trackID(genre, apiKey):
     """
     Calls the Spotify API to get the name and spotify ID for a random song in a
     specific genre
@@ -134,9 +143,6 @@ def get_random_track(genre, apiKey):
                      "It is likely the genre was not recognized"}
 
 
-exTrackID = "0oPdaY4dXtc3ZsaG17V972"  # TODO: FOR TESTING - REMOVE THIS
-
-
 def get_preview_URL(trackID, apiKey):
     """
     Given the spotify ID of a track, returns the URL for a 30 second preview
@@ -157,12 +163,26 @@ def get_preview_URL(trackID, apiKey):
     return previewURL
 
 
-def temp_download(preview_URL):
+def mp3_to_wav(mp3FilePath):
     """
-    Given a spotify preview URL, downloads it as a .mp3 file and returns the
+    Given the path to an .mp3 file, creates a .wav copy and returns the path to
+    the copy
+    """
+    # Get file path as .wav
+    wavFilePath = f"{mp3FilePath[0:-4]}.wav"
+
+    # Copy mp3 file to wav
+    sound = AudioSegment.from_mp3(mp3FilePath)
+    sound.export(wavFilePath, format="wav")
+
+    return wavFilePath
+
+
+def temp_download(previewURL):
+    """
+    Given a spotify preview URL, downloads it as a .wav file and returns the
     path to the file
     """
-
 
 
 def extract_features(trackFilePath):
@@ -233,7 +253,7 @@ def format_csvData(name, featureData, label):
     return csvString
 
 
-def append_data(dataString, csvFile="song_data.csv"):
+def append_data(dataString, csvFile):
     """
     Given a string, appends it to the end of a csv file.
 
@@ -242,6 +262,67 @@ def append_data(dataString, csvFile="song_data.csv"):
     """
     with open(csvFile, 'a', newline="") as file:
         file.write(dataString)
+
+
+def matching_headers(filepath):
+    """
+    Returns True/False if the given file has the expected headers
+    """
+    with open(filepath, "r") as file:
+        if file.readline() == CSV_HEADERS:
+            return True
+        else:
+            return False
+
+def add_headers(filepath):
+    """Adds headers to csv file. Overwrites file if not empty"""
+    with open(filepath, "w") as file:
+        file.write(CSV_HEADERS)
+
+def confirm_file(filepath):
+    """Check with the user that they are using the correct file"""
+    if os.path.exists(filepath):
+        print(f"The chosen file '{filepath}' already exists. What would you"
+              +" like to do?"
+              +"1. Overwrite file\n"
+              +"2. Add to file\n"
+              +"3. Quit\n")
+        choice = 0
+        while choice not in [1, 2, 3]:
+            choice = int(input("Option: "))
+        if choice == 1:
+            add_headers(filepath)
+        elif choice == 2:
+            if not matching_headers(filepath):
+                print("The headers for the selected file do not match. "
+                    + "Would you like to continue?\n"
+                    + "1. Yes\n"
+                    + "2. No\n")
+                choice2 = 0
+                while choice2 not in [1, 2]:
+                    choice2 = int(input("Option: "))
+                if choice2 == 2:
+                    sys.exit()
+        elif choice == 3:
+            sys.exit()
+
+def collect_spotify_data(genres, quantity, outputfile="track_features.csv"):
+    """
+    Gets audio clips from spotify, processes them to extract feature data, and
+    appends the data to a given file.
+        genres [list]   - Strings representing genres of music to get data for
+        quantity [int]  - The number of songs per genre to collect data for
+        file [string]   - The relative path to a csv file to store the data in
+
+    """ 
+    # Loop through genres and append feature data to file
+    for genre in genres:
+        tracksData = get_tracksData(genre, quantity)
+        for track in tracksData:
+            soundclip = temp_download(track["previewURL"])
+            features = extract_features(soundclip)
+            csvString = format_csvData(track["name"], features, genre)
+            append_data(csvString, outputfile)
 
 # # print(get_preview_URL(exTrackID))
     
