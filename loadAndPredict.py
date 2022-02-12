@@ -7,11 +7,13 @@ import librosa
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 
+# GLOBAL VARIABLES FOR TESTING PURPOSES
+
 # SONG_PATH = "Clincher.wav"
 # SONG_PATH = "Pathfinder.wav"
 # SONG_PATH = "someOtherMetal.wav"
 # SONG_PATH = "Metal3.wav"
-SONG_PATH = "California.wav"
+# SONG_PATH = "California.wav"
 # SONG_PATH = "Father.wav"
 
 
@@ -110,9 +112,9 @@ def indexToGenre(param):
     else:
         return "Error"
 
-
-if __name__ == '__main__':
-    header = init_dataset_header()
-    make_dataset(header, SONG_PATH)
-    model = keras.models.load_model("my_model")
-    print(predict(model))
+# FOR TESTING PURPOSES
+# if __name__ == '__main__':
+#     header = init_dataset_header()
+#     make_dataset(header, SONG_PATH)
+#     model = keras.models.load_model("my_model")
+#     print(predict(model))
