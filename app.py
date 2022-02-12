@@ -71,8 +71,8 @@ def upload_song():
 # --- TESTING STUBS ---
 def predict_genre(file):
     model = keras.models.load_model("my_model")
-    prediction = loadAndPredict.predict(model, file)
-    return {"rock": 80, "pop": 20}
+    prediction = loadAndPredict.predict(model)
+    return prediction
 
 
 def get_songs():
