@@ -52,10 +52,7 @@ def make_dataset(header, songFile):
     tempo = librosa.beat.tempo(y=y, sr=sr, onset_envelope=onset_env)
     # take the mean of each parameter (except filename)
     # and append it as a string
-    to_append = f'{np.mean(chroma_stft)} {np.var(chroma_stft)} {np.mean(rms)} {np.var(rms)} {np.mean(spec_cent)}'\
-                + f'{np.var(spec_cent)} {np.mean(spec_bw)} {np.var(spec_bw)} {np.mean(rolloff)} {np.var(rolloff)}'\
-                + f'{np.mean(zcr)} {np.var(zcr)} {np.mean(harmony)} {np.var(harmony)} {np.mean(percussion)}'\
-                + f'{np.var(percussion)} {np.sum(tempo)}'
+    to_append = f'{np.mean(chroma_stft)} {np.var(chroma_stft)} {np.mean(rms)} {np.var(rms)} {np.mean(spec_cent)} {np.var(spec_cent)} {np.mean(spec_bw)} {np.var(spec_bw)} {np.mean(rolloff)} {np.var(rolloff)} {np.mean(zcr)} {np.var(zcr)} {np.mean(harmony)} {np.var(harmony)} {np.mean(percussion)} {np.var(percussion)} {np.sum(tempo)}'
 
     # loop through all the mfcc values and append them
     # together to add them on the to_append variable
@@ -106,15 +103,16 @@ def predict(model, file):
 
 
 def indexToGenre(param):
-    if 0 <= param <= 9:
-        genres = ["Blues", "Classical", "Country", "Disco", "Hiphop", "Jazz", "Metal", "Pop", "Reggae", "Rock"]
-        return genres[param]
+    genreIndex = param[0]
+    if 0 <= genreIndex <= 9:
+        genres = ("Blues", "Classical", "Country", "Disco", "Hiphop", "Jazz", "Metal", "Pop", "Reggae", "Rock")
+        return genres[genreIndex]
     else:
         return "Error"
 
 # FOR TESTING PURPOSES
 # if __name__ == '__main__':
-#     header = init_dataset_header()
-#     make_dataset(header, SONG_PATH)
+#     # header = init_dataset_header()
+#     # make_dataset(header, SONG_PATH)
 #     model = keras.models.load_model("my_model")
-#     print(predict(model))
+#     print(predict(model, SONG_PATH))
