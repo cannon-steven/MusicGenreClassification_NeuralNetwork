@@ -7,13 +7,6 @@ import os
 import sys
 from pydub import AudioSegment
 
-# Information about client credential flow here (2 lines):
-# https://developer.spotify.com/documentation/general/guides/authorization/
-# client-credentials/
-
-# Also found this article helpful:
-# https://prettystatic.com/automate-the-spotify-api-with-python/
-
 # Given when registered with spotify developer API
 # TODO: THESE SHOULD BE MOVED TO .env
 CLIENT_ID = "d8d312f35e424b11857344f323971ad6"
@@ -31,7 +24,6 @@ CSV_HEADERS = "filename,chroma_stft,rmse,spectral_centroid,"\
             + "mfcc20,label"
 
 
-# --- GET DEVELOPER KEY ---
 def get_developer_key():
     """
     Get a developer API key from spotify. Required for accessing most of the
@@ -67,7 +59,6 @@ def get_developer_key():
     return token
 
 
-# --- GET SONGS ---
 def get_genres(apiKey):
     """
     Requests genres from the spotify API and returns a list of available genres
@@ -181,6 +172,12 @@ def temp_download(preview_url):
     Given a spotify preview URL, downloads it as a .wav file and returns the
     path to the file
     """
+    mp3Path = "temp.mp3"
+    with open(mp3Path, "wb") as mp3file:
+        clip = requests.get(preview_url)
+        mp3file.write(clip.content)
+
+    return mp3_to_wav(mp3Path)
 
 
 def extract_features(trackFilePath):
@@ -404,7 +401,16 @@ def collect_spotify_data(genres, quantity, outputfile="track_features.csv"):
     for genre in genres:
         tracksData = get_tracksData(genre, quantity)
         for track in tracksData:
-            soundclip = temp_download(track["preview_url"])
-            features = extract_features(soundclip)
-            csvString = format_csvData(track["name"], features, genre)
-            append_data(csvString, outputfile)
+            if track["preview_url"] is not None:  # Not every song has one
+                soundclip = temp_download(track["preview_url"])
+                features = extract_features(soundclip)
+                csvString = format_csvData(track["name"], features, genre)
+                append_data(csvString, outputfile)
+
+
+# Information about client credential flow here (2 lines):
+# https://developer.spotify.com/documentation/general/guides/authorization/
+# client-credentials/
+
+# Also found this article helpful:
+# https://prettystatic.com/automate-the-spotify-api-with-python/
