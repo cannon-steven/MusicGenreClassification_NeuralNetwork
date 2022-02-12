@@ -3,15 +3,17 @@ import numpy as np
 import os
 import csv
 import librosa.feature
+import librosa.display
 import matplotlib.pyplot as plt
 # Change this variable once the model is trained
 # to capture the single file audio inputs
 model_trained = True
+get_spectrogram = False
 
 
-def get_spectrogram_from_input_file():
+def get_spectrogram_from_input_file(songname):
     # Gets you a spectrogram of the input file by the user.
-    audio_path = os.path.abspath('song_name.wav')
+    audio_path = os.path.abspath(songname)
     x, sr = librosa.load(audio_path, sr=None)
     # display Spectrogram
     X = librosa.stft(x)
@@ -139,6 +141,8 @@ def init_dataset_header(song_name):
     header = header.split()
     # Use the function and pass it the header
     if model_trained:
+        # get the spectrogram of the song:
+        # get_spectrogram_from_input_file()
         # populate the array with the values we want.
         # populate the dictionary with the key: value pairs we want
         array_tuples = get_data_array(song_name)
@@ -152,4 +156,6 @@ def init_dataset_header(song_name):
 
 
 if __name__ == '__main__':
-    new_dict = init_dataset_header('song_name.wav')
+    print(init_dataset_header('song_name.wav'))
+    if get_spectrogram:
+        get_spectrogram_from_input_file('song_name.wav')
