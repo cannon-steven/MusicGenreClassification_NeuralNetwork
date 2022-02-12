@@ -7,15 +7,6 @@ import matplotlib.pyplot as plt
 # Change this variable once the model is trained
 # to capture the single file audio inputs
 model_trained = True
-data_array = []
-
-const = {"chroma_stft", "rmse", "spectral_centroid",
-    "spectral_bandwidth", "rolloff", "zero_crossing_rate",
-    "mfcc1", "mfcc2", "mfcc3", "mfcc4", "mfcc5", "mfcc6",
-    "mfcc7", "mfcc8",
-    "mfcc9", "mfcc10", "mfcc11", "mfcc12", "mfcc13",
-    "mfcc14", "mfcc15",
-    "mfcc16", "mfcc17", "mfcc18", "mfcc19", "mfcc20"}
 
 
 def get_spectrogram_from_input_file():
@@ -49,22 +40,21 @@ def get_data_array(song_name):
     y, sr = librosa.load(songname, mono=True, duration=30)
     # chroma short time fourier transform
     arr.append(make_tuple('chroma_stft',
-                               np.mean(librosa.feature.chroma_stft(y=y, sr=sr))
-                               ))
+                          np.mean(librosa.feature.chroma_stft(y=y, sr=sr))))
     # root mean square deviation
     arr.append(make_tuple('rmse', np.mean(librosa.feature.rmse(y=y))))
     # spectral centroid
-    arr.append(make_tuple('spectral_c',
-                          np.mean(librosa.feature.spectral_centroid(y=y, sr=sr))))
+    arr.append(make_tuple('spectral_c', np.mean(
+        librosa.feature.spectral_centroid(y=y, sr=sr))))
     # spectral bandwidth
-    arr.append(make_tuple('spectral_bw',
-                      np.mean(librosa.feature.spectral_bandwidth(y=y, sr=sr))))
+    arr.append(make_tuple('spectral_bw', np.mean(
+                          librosa.feature.spectral_bandwidth(y=y, sr=sr))))
     # spectral rolloff
-    arr.append(make_tuple('spectral_rf',
-                      np.mean(librosa.feature.spectral_rolloff(y=y, sr=sr))))
+    arr.append(make_tuple('spectral_rf', np.mean(
+                          librosa.feature.spectral_rolloff(y=y, sr=sr))))
     # zero crossing rate
-    arr.append(make_tuple('zcr',
-                      np.mean(librosa.feature.zero_crossing_rate(y))))
+    arr.append(make_tuple('zcr', np.mean(
+                          librosa.feature.zero_crossing_rate(y))))
     # The Mel-Frequency Cepstral Coefficients (20 in our case)
     mfcc = librosa.feature.mfcc(y=y, sr=sr)
     # loop through all the mfcc values and add them to an array
@@ -163,4 +153,3 @@ def init_dataset_header(song_name):
 
 if __name__ == '__main__':
     new_dict = init_dataset_header('song_name.wav')
-    print(new_dict)
