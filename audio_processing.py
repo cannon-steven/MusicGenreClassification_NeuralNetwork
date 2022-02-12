@@ -3,6 +3,73 @@ import numpy as np
 import os
 import csv
 import librosa.feature
+import librosa.display
+import matplotlib.pyplot as plt
+# Change this variable once the model is trained
+# to capture the single file audio inputs
+model_trained = True
+get_spectrogram = False
+
+
+def get_spectrogram_from_input_file(songname):
+    # Gets you a spectrogram of the input file by the user.
+    audio_path = os.path.abspath(songname)
+    x, sr = librosa.load(audio_path, sr=None)
+    # display Spectrogram
+    X = librosa.stft(x)
+    Xdb = librosa.amplitude_to_db(abs(X))
+    plt.figure(figsize=(14, 5))
+    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
+    # If to pring log of frequencies
+    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='log')
+    plt.colorbar()
+
+
+def make_tuple(key, value):
+    return (key, value)
+
+
+def make_dictionary(array_tuples):
+    return dict(array_tuples)
+
+
+def get_data_array(song_name):
+
+    arr = []
+    # songname is the .wav filename
+    songname = os.path.abspath(song_name)
+    #  sr = sampling rate, y = audio time series
+    y, sr = librosa.load(songname, mono=True, duration=30)
+    # chroma short time fourier transform
+    arr.append(make_tuple('chroma_stft',
+                          np.mean(librosa.feature.chroma_stft(y=y, sr=sr))))
+    # root mean square deviation
+    arr.append(make_tuple('rmse', np.mean(librosa.feature.rmse(y=y))))
+    # spectral centroid
+    arr.append(make_tuple('spectral_c', np.mean(
+        librosa.feature.spectral_centroid(y=y, sr=sr))))
+    # spectral bandwidth
+    arr.append(make_tuple('spectral_bw', np.mean(
+                          librosa.feature.spectral_bandwidth(y=y, sr=sr))))
+    # spectral rolloff
+    arr.append(make_tuple('spectral_rf', np.mean(
+                          librosa.feature.spectral_rolloff(y=y, sr=sr))))
+    # zero crossing rate
+    arr.append(make_tuple('zcr', np.mean(
+                          librosa.feature.zero_crossing_rate(y))))
+    # The Mel-Frequency Cepstral Coefficients (20 in our case)
+    mfcc = librosa.feature.mfcc(y=y, sr=sr)
+    # loop through all the mfcc values and add them to an array
+    index = 0
+    for e in mfcc:
+        index += 1
+        arr.append(make_tuple(f"mfcc{index}", np.mean(e)))
+    return arr
+
+
+def get_wav_path(song_name):
+    # songname is the .wav filename
+    return os.path.abspath(song_name)
 
 
 def make_dataset(header):
@@ -59,7 +126,7 @@ def make_dataset(header):
                 writer.writerow(to_append.split())
 
 
-def init_dataset_header():
+def init_dataset_header(song_name):
     '''
     Initializes the header for the data.csv file.
     Uses the make_dataset() function to generate the data.csv file.
@@ -73,8 +140,22 @@ def init_dataset_header():
     header += ' label'
     header = header.split()
     # Use the function and pass it the header
-    make_dataset(header)
+    if model_trained:
+        # get the spectrogram of the song:
+        # get_spectrogram_from_input_file()
+        # populate the array with the values we want.
+        # populate the dictionary with the key: value pairs we want
+        array_tuples = get_data_array(song_name)
+        # make sure that this is length 26
+        new_dict_with_data = make_dictionary(array_tuples)
+        # call this function and return the dictionary
+        return new_dict_with_data
+    else:
+        # make the dataset
+        make_dataset(header)
 
 
 if __name__ == '__main__':
-    init_dataset_header()
+    print(init_dataset_header('song_name.wav'))
+    if get_spectrogram:
+        get_spectrogram_from_input_file('song_name.wav')
