@@ -56,26 +56,17 @@ def make_dataset(header):
             tempo = librosa.beat.tempo(y=y, sr=sr, onset_envelope=onset_env)
             # harmonics and percussiveness
             harmony, percussion = librosa.effects.hpss(y=y)
-            to_append = f'{np.mean(chroma_stft)} {np.var(chroma_stft)} {np.mean(rms)} {np.var(rms)} {np.mean(spec_cent)}'\
-                + f'{np.var(spec_cent)} {np.mean(spec_bw)} {np.var(spec_bw)} {np.mean(rolloff)} {np.var(rolloff)}'\
-                + f'{np.mean(zcr)} {np.var(zcr)} {np.mean(harmony)} {np.var(harmony)} {np.mean(percussion)}'\
-                + f'{np.var(percussion)} {np.sum(tempo)}'
-
+            to_append = f'{np.mean(chroma_stft)} {np.var(chroma_stft)} {np.mean(rms)} {np.var(rms)} {np.mean(spec_cent)} {np.var(spec_cent)} {np.mean(spec_bw)} {np.var(spec_bw)} {np.mean(rolloff)} {np.var(rolloff)} {np.mean(zcr)} {np.var(zcr)} {np.mean(harmony)} {np.var(harmony)} {np.mean(percussion)} {np.var(percussion)} {np.sum(tempo)}'
             # loop through all the mfcc values and append them
             # together to add them on the to_append variable
             for e in mfcc:
                 to_append += f' {np.mean(e)} {np.var(e)}'
 
             # add the row of attributes into our data.csv file
-            print(len(to_append.split()))
-            if len(to_append.split()) == number_header_cols:
-                print(type(to_append))
-                file = open('data.csv', 'a', newline='')
-                with file:
-                    writer = csv.writer(file)
-                    writer.writerow(to_append.split())
-            else:
-                return
+            file = open('data1.csv', 'a', newline='')
+            with file:
+                writer = csv.writer(file)
+                writer.writerow(to_append.split())
 
 
 def init_dataset_header():
@@ -103,7 +94,6 @@ def init_dataset_header():
     # Make sure the length of the headers is correct
     number_header_cols = len(header)
     if number_header_cols == 57:
-        print(len(header))
         make_dataset(header)
 
 
