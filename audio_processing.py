@@ -5,71 +5,12 @@ import csv
 import librosa.feature
 import librosa.display
 import matplotlib.pyplot as plt
+
+
 # Change this variable once the model is trained
 # to capture the single file audio inputs
-model_trained = True
-get_spectrogram = False
-
-
-def get_spectrogram_from_input_file(songname):
-    # Gets you a spectrogram of the input file by the user.
-    audio_path = os.path.abspath(songname)
-    x, sr = librosa.load(audio_path, sr=None)
-    # display Spectrogram
-    X = librosa.stft(x)
-    Xdb = librosa.amplitude_to_db(abs(X))
-    plt.figure(figsize=(14, 5))
-    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
-    # If to pring log of frequencies
-    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='log')
-    plt.colorbar()
-
-
-def make_tuple(key, value):
-    return (key, value)
-
-
-def make_dictionary(array_tuples):
-    return dict(array_tuples)
-
-
-def get_data_array(song_name):
-
-    arr = []
-    # songname is the .wav filename
-    songname = os.path.abspath(song_name)
-    #  sr = sampling rate, y = audio time series
-    y, sr = librosa.load(songname, mono=True, duration=30)
-    # chroma short time fourier transform
-    arr.append(make_tuple('chroma_stft',
-                          np.mean(librosa.feature.chroma_stft(y=y, sr=sr))))
-    # root mean square deviation
-    arr.append(make_tuple('rmse', np.mean(librosa.feature.rmse(y=y))))
-    # spectral centroid
-    arr.append(make_tuple('spectral_c', np.mean(
-        librosa.feature.spectral_centroid(y=y, sr=sr))))
-    # spectral bandwidth
-    arr.append(make_tuple('spectral_bw', np.mean(
-                          librosa.feature.spectral_bandwidth(y=y, sr=sr))))
-    # spectral rolloff
-    arr.append(make_tuple('spectral_rf', np.mean(
-                          librosa.feature.spectral_rolloff(y=y, sr=sr))))
-    # zero crossing rate
-    arr.append(make_tuple('zcr', np.mean(
-                          librosa.feature.zero_crossing_rate(y))))
-    # The Mel-Frequency Cepstral Coefficients (20 in our case)
-    mfcc = librosa.feature.mfcc(y=y, sr=sr)
-    # loop through all the mfcc values and add them to an array
-    index = 0
-    for e in mfcc:
-        index += 1
-        arr.append(make_tuple(f"mfcc{index}", np.mean(e)))
-    return arr
-
-
-def get_wav_path(song_name):
-    # songname is the .wav filename
-    return os.path.abspath(song_name)
+model_trained = False
+number_header_cols = 0
 
 
 def make_dataset(header):
@@ -97,7 +38,7 @@ def make_dataset(header):
             # chroma short time fourier transform
             chroma_stft = librosa.feature.chroma_stft(y=y, sr=sr)
             # root mean square deviation
-            rmse = librosa.feature.rmse(y=y)
+            rms = librosa.feature.rms(y=y)
             # spectral centroid
             spec_cent = librosa.feature.spectral_centroid(y=y, sr=sr)
             # spectral bandwidth
@@ -110,52 +51,61 @@ def make_dataset(header):
             mfcc = librosa.feature.mfcc(y=y, sr=sr)
             # take the mean of each parameter (except filename)
             # and append it as a string
-            to_append = f'{filename} {np.mean(chroma_stft)}'
-            to_append = f'{np.mean(rmse)} {np.mean(spec_cent)}'
-            to_append = f'{np.mean(spec_bw)} {np.mean(rolloff)} {np.mean(zcr)}'
+            # tempo
+            onset_env = librosa.onset.onset_strength(y=y, sr=sr)
+            tempo = librosa.beat.tempo(y=y, sr=sr, onset_envelope=onset_env)
+            # harmonics and percussiveness
+            harmony, percussion = librosa.effects.hpss(y=y)
+            to_append = f'{np.mean(chroma_stft)} {np.var(chroma_stft)} {np.mean(rms)} {np.var(rms)} {np.mean(spec_cent)}'\
+                + f'{np.var(spec_cent)} {np.mean(spec_bw)} {np.var(spec_bw)} {np.mean(rolloff)} {np.var(rolloff)}'\
+                + f'{np.mean(zcr)} {np.var(zcr)} {np.mean(harmony)} {np.var(harmony)} {np.mean(percussion)}'\
+                + f'{np.var(percussion)} {np.sum(tempo)}'
 
             # loop through all the mfcc values and append them
             # together to add them on the to_append variable
             for e in mfcc:
-                to_append += f' {np.mean(e)}'
-            to_append += f' {g}'
+                to_append += f' {np.mean(e)} {np.var(e)}'
+
             # add the row of attributes into our data.csv file
-            file = open('data.csv', 'a', newline='')
-            with file:
-                writer = csv.writer(file)
-                writer.writerow(to_append.split())
+            print(len(to_append.split()))
+            if len(to_append.split()) == number_header_cols:
+                print(type(to_append))
+                file = open('data.csv', 'a', newline='')
+                with file:
+                    writer = csv.writer(file)
+                    writer.writerow(to_append.split())
+            else:
+                return
 
 
-def init_dataset_header(song_name):
+def init_dataset_header():
     '''
     Initializes the header for the data.csv file.
     Uses the make_dataset() function to generate the data.csv file.
     '''
-    header = '''filename chroma_stft rmse spectral_centroid
-    spectral_bandwidth rolloff zero_crossing_rate'''
-
-    # I need to generate 21 columns in the csv file for the mfcc values
-    for i in range(1, 21):
-        header += f' mfcc{i}'
-    header += ' label'
+    header = '''chroma_stft_mean chroma_stft_var rms_mean rms_var
+    spectral_centroid_mean spectral_centroid_var
+    spectral_bandwidth_mean spectral_bandwidth_var
+    rolloff_mean rolloff_var zero_crossing_rate_mean
+    zero_crossing_rate_var harmony_mean
+    harmony_var perceptr_mean perceptr_var tempo mfcc1_mean
+    mfcc1_var mfcc2_mean mfcc2_var
+    mfcc3_mean mfcc3_var mfcc4_mean mfcc4_var mfcc5_mean
+    mfcc5_var mfcc6_mean mfcc6_var
+    mfcc7_mean mfcc7_var mfcc8_mean mfcc8_var mfcc9_mean
+    mfcc9_var mfcc10_mean mfcc10_var
+    mfcc11_mean mfcc11_var mfcc12_mean mfcc12_var
+    mfcc13_mean mfcc13_var mfcc14_mean mfcc14_var
+    mfcc15_mean mfcc15_var mfcc16_mean mfcc16_var
+    mfcc17_mean mfcc17_var mfcc18_mean mfcc18_var
+    mfcc19_mean mfcc19_var mfcc20_mean mfcc20_var'''
     header = header.split()
-    # Use the function and pass it the header
-    if model_trained:
-        # get the spectrogram of the song:
-        # get_spectrogram_from_input_file()
-        # populate the array with the values we want.
-        # populate the dictionary with the key: value pairs we want
-        array_tuples = get_data_array(song_name)
-        # make sure that this is length 26
-        new_dict_with_data = make_dictionary(array_tuples)
-        # call this function and return the dictionary
-        return new_dict_with_data
-    else:
-        # make the dataset
+    # Make sure the length of the headers is correct
+    number_header_cols = len(header)
+    if number_header_cols == 57:
+        print(len(header))
         make_dataset(header)
 
 
 if __name__ == '__main__':
-    print(init_dataset_header('song_name.wav'))
-    if get_spectrogram:
-        get_spectrogram_from_input_file('song_name.wav')
+    init_dataset_header()
