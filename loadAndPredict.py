@@ -87,26 +87,20 @@ def init_dataset_header():
     return header
 
 
-def predict(model):
+def predict(model, file):
+    header = init_dataset_header()
+    make_dataset(header, file)
     df = pd.read_csv("testData.csv")
-    # add a dimension to input data for sample - model.predict() expects a 4d array in this case
-    # df = df[np.newaxis, ...] # array shape (1, 130, 13, 1)
-    # print(df)
-    # df = df[..., np.newaxis]
-    # print(df.shape)
+
     # perform prediction
     prediction = model.predict(df)
-    # print("Early Prediction:")
-    # print(prediction.shape)
-    # print(prediction)
+
     # get index with max value
-    # print(prediction)
     predicted_index = np.argmax(prediction, axis=1)
-    # print(predicted_index)
 
     predicted_genre = indexToGenre(predicted_index)
 
-    return "Predicted Genre: {}".format(predicted_genre)
+    return predicted_genre
 
 
 def indexToGenre(param):
