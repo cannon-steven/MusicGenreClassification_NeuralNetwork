@@ -7,7 +7,6 @@ import librosa
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 
-
 # SONG_PATH = "Clincher.wav"
 # SONG_PATH = "Pathfinder.wav"
 # SONG_PATH = "someOtherMetal.wav"
@@ -54,8 +53,10 @@ def make_dataset(header, songFile):
     tempo = librosa.beat.tempo(y=y, sr=sr, onset_envelope=onset_env)
     # take the mean of each parameter (except filename)
     # and append it as a string
-    to_append = f'{np.mean(chroma_stft)} {np.var(chroma_stft)} {np.mean(rms)} {np.var(rms)} {np.mean(spec_cent)} {np.var(spec_cent)} {np.mean(spec_bw)} {np.var(spec_bw)} {np.mean(rolloff)} {np.var(rolloff)} {np.mean(zcr)} {np.var(zcr)} {np.mean(harmony)} {np.var(harmony)} {np.mean(percussion)} {np.var(percussion)} {np.sum(tempo)}'
-
+    to_append = f'{np.mean(chroma_stft)} {np.var(chroma_stft)} {np.mean(rms)} {np.var(rms)} {np.mean(spec_cent)}'\
+                + f'{np.var(spec_cent)} {np.mean(spec_bw)} {np.var(spec_bw)} {np.mean(rolloff)} {np.var(rolloff)}'\
+                + f'{np.mean(zcr)} {np.var(zcr)} {np.mean(harmony)} {np.var(harmony)} {np.mean(percussion)}'\
+                + f'{np.var(percussion)} {np.sum(tempo)}'
 
     # loop through all the mfcc values and append them
     # together to add them on the to_append variable
