@@ -1,5 +1,7 @@
 from flask import Flask, request, Response, render_template
+from tensorflow import keras
 import json
+import loadAndPredict
 
 ALLOWED_EXTENSIONS = {'wav'}
 
@@ -68,6 +70,8 @@ def upload_song():
 
 # --- TESTING STUBS ---
 def predict_genre(file):
+    model = keras.models.load_model("my_model")
+    prediction = loadAndPredict.predict(model, file)
     return {"rock": 80, "pop": 20}
 
 
