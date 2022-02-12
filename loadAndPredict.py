@@ -111,7 +111,7 @@ def predict(model):
 
 def indexToGenre(param):
     if 0 <= param <= 9:
-        genres = ["blues", "classical", "country", "disco", "hiphop", "jazz", "metal", "pop", "reggae", "rock"]
+        genres = ["Blues", "Classical", "Country", "Disco", "Hiphop", "Jazz", "Metal", "Pop", "Reggae", "Rock"]
         return genres[param]
     else:
         return "Error"
