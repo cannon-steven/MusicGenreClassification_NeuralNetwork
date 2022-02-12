@@ -306,7 +306,7 @@ def confirm_file(filepath):
 
         elif choice == 3:
             sys.exit()
-    
+
     else:
         add_headers(filepath)
 
@@ -410,6 +410,7 @@ def collect_spotify_data(genres, quantity, outputfile="track_features.csv"):
     # Prepare file
     confirm_file(outputfile)
 
+    i = 0
     # Loop through genres and append feature data to file
     for genre in genres:
         tracksData = get_tracksData(genre, quantity, apiKey)
@@ -419,6 +420,8 @@ def collect_spotify_data(genres, quantity, outputfile="track_features.csv"):
                 features = extract_features(soundclip)
                 csvString = format_csvData(track["name"], features, genre)
                 append_data(csvString, outputfile)
+                i += 1
+                print(f"Added song: {i}")
 
 
 # Information about client credential flow here (2 lines):
