@@ -218,7 +218,7 @@ def extract_features(trackFilePath):
         np.mean(librosa.feature.zero_crossing_rate(y=timeSeries))
     i = 1
     for coefficient in librosa.feature.mfcc(y=timeSeries):
-        features[f"mfcc{i}"] = coefficient
+        features[f"mfcc{i}"] = np.mean(coefficient)
         i += 1
 
     return features
@@ -233,9 +233,9 @@ def format_csvData(name, featureData, label):
     """
     mfccString = ""
     for i in range(1, 21):  # mfcc1 to mfcc20
-        mfccString.append(featureData[f"mfcc{i},"])
+        mfccString += str(featureData[f"mfcc{i}"]) + ","
 
-    csvString = f"{name}"\
+    csvString = f"{name},"\
                 + f"{featureData['chroma_stft']},"\
                 + f"{featureData['rms']},"\
                 + f"{featureData['spectral_centroid']},"\
@@ -243,7 +243,7 @@ def format_csvData(name, featureData, label):
                 + f"{featureData['rolloff']},"\
                 + f"{featureData['zero_crossing_rate']},"\
                 + f"{mfccString}"\
-                + f"{label}"
+                + f"{label}"\
 
     return csvString
 
@@ -256,6 +256,7 @@ def append_data(dataString, csvFile):
     spectral_bandwidth,rolloff,zero_crossing_rate,mfcc1,...,mfcc20,label"
     """
     with open(csvFile, 'a', newline="") as file:
+        file.write("\n")
         file.write(dataString)
 
 
@@ -280,15 +281,17 @@ def confirm_file(filepath):
     """Check with the user that they are using the correct file"""
     if os.path.exists(filepath):
         print(f"The chosen file '{filepath}' already exists. What would you"
-              + " like to do?"
+              + " like to do?\n"
               + "1. Overwrite file\n"
               + "2. Add to file\n"
-              + "3. Quit\n")
+              + "3. Quit")
         choice = 0
         while choice not in [1, 2, 3]:
             choice = int(input("Option: "))
+
         if choice == 1:
             add_headers(filepath)
+
         elif choice == 2:
             if not matching_headers(filepath):
                 print("The headers for the selected file do not match. "
@@ -300,8 +303,12 @@ def confirm_file(filepath):
                     choice2 = int(input("Option: "))
                 if choice2 == 2:
                     sys.exit()
+
         elif choice == 3:
             sys.exit()
+    
+    else:
+        add_headers(filepath)
 
 
 def get_tracksData(genre, quantity, apiKey):
@@ -397,9 +404,15 @@ def collect_spotify_data(genres, quantity, outputfile="track_features.csv"):
         file [string]   - The relative path to a csv file to store the data in
 
     """
+    # Get API Key
+    apiKey = get_developer_key()
+
+    # Prepare file
+    confirm_file(outputfile)
+
     # Loop through genres and append feature data to file
     for genre in genres:
-        tracksData = get_tracksData(genre, quantity)
+        tracksData = get_tracksData(genre, quantity, apiKey)
         for track in tracksData:
             if track["preview_url"] is not None:  # Not every song has one
                 soundclip = temp_download(track["preview_url"])
