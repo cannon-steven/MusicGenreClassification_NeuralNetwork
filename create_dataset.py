@@ -1,5 +1,5 @@
 import sys
-import SpotifyPreviews as sp
+import Spotify_API_utilities as sp
 
 # Creates a .csv file filled with feature data extracted from song clips on
 # Spotify. Quantity is the number of songs in each genre you would like to add
