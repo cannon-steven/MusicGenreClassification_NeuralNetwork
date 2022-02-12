@@ -42,6 +42,25 @@ This project will focus on:
 
 * Fork this repository (do not clone) to your own GitHub account.
 
+### Installation Instructions 
+
+* Please make sure you have a python ^3.9.0 version and up.
+* For ways to download Python to different operating systems, please refer to the official guides: https://www.python.org/downloads/
+* Once you have python3 installed:
+* You can clone the repo or fork it:
+#### To clone:
+* git clone https://github.com/cannon-steven/MusicGenreClassification_NeuralNetwork.git give_a_project_name
+
+#### To install dependencies/requirements
+* pip install -r requirements.txt
+
+#### To run the Flask server
+* export FLASK_APP=give_a_project_name
+* flask run
+
+
+#### You will see the server running on your terminal and can open the link to view the project.
+
 ### Resources 
 ###### Feel free to add any good resources on Tensorflow and Keras
 

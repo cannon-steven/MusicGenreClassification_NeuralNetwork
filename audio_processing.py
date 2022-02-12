@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 # Change this variable once the model is trained
 # to capture the single file audio inputs
 model_trained = True
-data_array = []
 
 
 def get_spectrogram_from_input_file():
@@ -24,37 +23,51 @@ def get_spectrogram_from_input_file():
     plt.colorbar()
 
 
-def append_to_array(param):
-    data_array.append(param)
+def make_tuple(key, value):
+    return (key, value)
+
+
+def make_dictionary(array_tuples):
+    return dict(array_tuples)
 
 
 def get_data_array(song_name):
-    '''
-    Uses the song_name.wav file and returns an array
-    with the data needed for our model to make predictions post training.
-    '''
+
+    arr = []
     # songname is the .wav filename
     songname = os.path.abspath(song_name)
     #  sr = sampling rate, y = audio time series
     y, sr = librosa.load(songname, mono=True, duration=30)
     # chroma short time fourier transform
-    append_to_array(librosa.feature.chroma_stft(y=y, sr=sr))
+    arr.append(make_tuple('chroma_stft',
+                          np.mean(librosa.feature.chroma_stft(y=y, sr=sr))))
     # root mean square deviation
-    append_to_array(librosa.feature.rmse(y=y))
+    arr.append(make_tuple('rmse', np.mean(librosa.feature.rmse(y=y))))
     # spectral centroid
-    append_to_array(librosa.feature.spectral_centroid(y=y, sr=sr))
+    arr.append(make_tuple('spectral_c', np.mean(
+        librosa.feature.spectral_centroid(y=y, sr=sr))))
     # spectral bandwidth
-    append_to_array(librosa.feature.spectral_bandwidth(y=y, sr=sr))
+    arr.append(make_tuple('spectral_bw', np.mean(
+                          librosa.feature.spectral_bandwidth(y=y, sr=sr))))
     # spectral rolloff
-    append_to_array(librosa.feature.spectral_rolloff(y=y, sr=sr))
+    arr.append(make_tuple('spectral_rf', np.mean(
+                          librosa.feature.spectral_rolloff(y=y, sr=sr))))
     # zero crossing rate
-    append_to_array(librosa.feature.zero_crossing_rate(y))
-    # The Mel-Frequency Cepstral Coefficients (21 in our case)
+    arr.append(make_tuple('zcr', np.mean(
+                          librosa.feature.zero_crossing_rate(y))))
+    # The Mel-Frequency Cepstral Coefficients (20 in our case)
     mfcc = librosa.feature.mfcc(y=y, sr=sr)
     # loop through all the mfcc values and add them to an array
+    index = 0
     for e in mfcc:
-        data_array.append(np.mean(e))
-    return data_array
+        index += 1
+        arr.append(make_tuple(f"mfcc{index}", np.mean(e)))
+    return arr
+
+
+def get_wav_path(song_name):
+    # songname is the .wav filename
+    return os.path.abspath(song_name)
 
 
 def make_dataset(header):
@@ -126,11 +139,17 @@ def init_dataset_header(song_name):
     header = header.split()
     # Use the function and pass it the header
     if model_trained:
-        # Should have a length of 26 values
-        get_data_array(song_name)
+        # populate the array with the values we want.
+        # populate the dictionary with the key: value pairs we want
+        array_tuples = get_data_array(song_name)
+        # make sure that this is length 26
+        new_dict_with_data = make_dictionary(array_tuples)
+        # call this function and return the dictionary
+        return new_dict_with_data
     else:
+        # make the dataset
         make_dataset(header)
 
 
 if __name__ == '__main__':
-    init_dataset_header('song_name.wav')
+    new_dict = init_dataset_header('song_name.wav')
