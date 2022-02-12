@@ -110,26 +110,9 @@ def predict(model):
 
 
 def indexToGenre(param):
-    if param == 0:
-        return "Blues"
-    elif param == 1:
-        return "Classical"
-    elif param == 2:
-        return "Country"
-    elif param == 3:
-        return "Disco"
-    elif param == 4:
-        return "HipHop"
-    elif param == 5:
-        return "Jazz"
-    elif param == 6:
-        return "Metal"
-    elif param == 7:
-        return "Pop"
-    elif param == 8:
-        return "Reggae"
-    elif param == 9:
-        return "Rock"
+    if 0 <= param <= 9:
+        genres = ["blues", "classical", "country", "disco", "hiphop", "jazz", "metal", "pop", "reggae", "rock"]
+        return genres[param]
     else:
         return "Error"
 
