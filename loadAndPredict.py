@@ -13,9 +13,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 # SONG_PATH = "Metal3.wav"
 SONG_PATH = "California.wav"
 # SONG_PATH = "Father.wav"
-SAMPLE_RATE = 22050
-TRACK_DURATION = 30  # measured in seconds
-SAMPLES_PER_TRACK = SAMPLE_RATE * TRACK_DURATION # which is 661500
 
 
 def make_dataset(header, songFile):
@@ -94,22 +91,22 @@ def predict(model):
     df = pd.read_csv("testData.csv")
     # add a dimension to input data for sample - model.predict() expects a 4d array in this case
     # df = df[np.newaxis, ...] # array shape (1, 130, 13, 1)
-    print(df)
+    # print(df)
     # df = df[..., np.newaxis]
-    print(df.shape)
+    # print(df.shape)
     # perform prediction
     prediction = model.predict(df)
     # print("Early Prediction:")
     # print(prediction.shape)
     # print(prediction)
     # get index with max value
-    print(prediction)
+    # print(prediction)
     predicted_index = np.argmax(prediction, axis=1)
-    print(predicted_index)
+    # print(predicted_index)
 
     predicted_genre = indexToGenre(predicted_index)
 
-    return "Target: Metal, Predicted label: {}".format(predicted_genre)
+    return "Predicted Genre: {}".format(predicted_genre)
 
 
 def indexToGenre(param):
