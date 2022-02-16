@@ -70,7 +70,6 @@ def upload_song():
     if file and is_allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(temp_dir.name, filename))
-
     # Send file to the model
     genreResults = predict_genre(f'{temp_dir.name}/{filename}')
     # delete the temporary file
