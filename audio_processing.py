@@ -4,7 +4,6 @@ import os
 import csv
 import librosa.feature
 import librosa.display
-import matplotlib.pyplot as plt
 
 
 # Change this variable once the model is trained
