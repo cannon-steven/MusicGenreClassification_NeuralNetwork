@@ -34,7 +34,7 @@ def make_dataset(header):
             # songname is the .wav filename
             songname = f'./genres/{g}/{filename}'
             #  sr = sampling rate, y = audio time series
-            y, sr = librosa.load(songname, mono=True, duration=30)
+            y, sr = librosa.load(songname, mono=True, duration=3)
             # chroma short time fourier transform
             chroma_stft = librosa.feature.chroma_stft(y=y, sr=sr)
             # root mean square deviation
@@ -56,14 +56,21 @@ def make_dataset(header):
             tempo = librosa.beat.tempo(y=y, sr=sr, onset_envelope=onset_env)
             # harmonics and percussiveness
             harmony, percussion = librosa.effects.hpss(y=y)
-            to_append = f'{np.mean(chroma_stft)} {np.var(chroma_stft)} {np.mean(rms)} {np.var(rms)} {np.mean(spec_cent)} {np.var(spec_cent)} {np.mean(spec_bw)} {np.var(spec_bw)} {np.mean(rolloff)} {np.var(rolloff)} {np.mean(zcr)} {np.var(zcr)} {np.mean(harmony)} {np.var(harmony)} {np.mean(percussion)} {np.var(percussion)} {np.sum(tempo)}'
+            to_append = f'''{filename} {np.mean(chroma_stft)}\
+                        {np.var(chroma_stft)} {np.mean(rms)}\
+                        {np.var(rms)} {np.mean(spec_cent)}\
+                        {np.var(spec_cent)} {np.mean(spec_bw)}\
+                        {np.var(spec_bw)} {np.mean(rolloff)}\
+                        {np.var(rolloff)} {np.mean(zcr)} {np.var(zcr)}\
+                        {np.mean(harmony)} {np.var(harmony)}\
+                        {np.mean(percussion)} {np.var(percussion)}
+                        {np.sum(tempo)}'''
             # loop through all the mfcc values and append them
             # together to add them on the to_append variable
             for e in mfcc:
                 to_append += f' {np.mean(e)} {np.var(e)}'
-
             # add the row of attributes into our data.csv file
-            file = open('data1.csv', 'a', newline='')
+            file = open('data.csv', 'a', newline='')
             with file:
                 writer = csv.writer(file)
                 writer.writerow(to_append.split())
@@ -74,7 +81,7 @@ def init_dataset_header():
     Initializes the header for the data.csv file.
     Uses the make_dataset() function to generate the data.csv file.
     '''
-    header = '''chroma_stft_mean chroma_stft_var rms_mean rms_var
+    header = '''filename chroma_stft_mean chroma_stft_var rms_mean rms_var
     spectral_centroid_mean spectral_centroid_var
     spectral_bandwidth_mean spectral_bandwidth_var
     rolloff_mean rolloff_var zero_crossing_rate_mean
@@ -92,9 +99,7 @@ def init_dataset_header():
     mfcc19_mean mfcc19_var mfcc20_mean mfcc20_var'''
     header = header.split()
     # Make sure the length of the headers is correct
-    number_header_cols = len(header)
-    if number_header_cols == 57:
-        make_dataset(header)
+    make_dataset(header)
 
 
 if __name__ == '__main__':
