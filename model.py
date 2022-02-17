@@ -50,8 +50,10 @@ def buildModel(X_train):
 
 
 if __name__ == '__main__':
-    df = pd.read_csv("features_3_sec.csv")
-    df = df.drop(['filename', 'length'], axis=1)
+    df = pd.read_csv("data.csv")
+    df = df.drop(['filename'], 1)
+    # Remove corrupted audio file
+    # df.drop(df.loc[df.filename == 'jazz.00054.wav'].index, inplace=True)
 
     # slice off class list at end of csv and encode for y axis
     class_list = df.iloc[:, -1]
@@ -60,7 +62,7 @@ if __name__ == '__main__':
 
     # scale X axis
     fit = StandardScaler()
-    X = fit.fit_transform(np.array(df.iloc[:, :-1], dtype=float))
+    X = fit.fit_transform(np.array(df.iloc[:, :-2], dtype=float))
 
     # populate test and train data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.25)
@@ -78,4 +80,4 @@ if __name__ == '__main__':
     plotValidate(history)
 
     # # save model for later use (uncomment only when you want to create a new model
-    # model.save("my_model")
+    model.save("my_model")

@@ -2,10 +2,18 @@ from flask import Flask, request, Response, render_template
 from tensorflow import keras
 import json
 import loadAndPredict
+import os
+from werkzeug.utils import secure_filename
+import tempfile
 
 ALLOWED_EXTENSIONS = {'wav'}
 
 app = Flask(__name__)
+
+# We should set the maximum content length
+# (you can check your .wav file size with
+# ls -lh songname.wav):
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
 
 
 # --- HELPER FUNCTIONS ---
@@ -55,8 +63,17 @@ def upload_song():
     if not is_allowed_file(file.filename):  # file.filename = "example.wav"
         return {"error": "Expected a .wav file"}, 400
 
+    # make a temporary directory where you can save uploaded files
+    temp_dir = tempfile.TemporaryDirectory()
+    # make sure the file is not wrapped in the fileStorage class
+    # before sending it to the predict_genre
+    if file and is_allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(temp_dir.name, filename))
     # Send file to the model
-    genreResults = predict_genre(file)
+    genreResults = predict_genre(f'{temp_dir.name}/{filename}')
+    # delete the temporary file
+    temp_dir.cleanup()
 
     return Response(
                     response=json.dumps({
