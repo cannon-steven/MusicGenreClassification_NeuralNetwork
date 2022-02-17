@@ -6,4 +6,5 @@ genres
 venv
 .vscode
 data.csv
-song_name.wav
+# Ignore files with the specific extension
+*.wav
