@@ -9,7 +9,6 @@ import librosa.display
 # Change this variable once the model is trained
 # to capture the single file audio inputs
 model_trained = False
-number_header_cols = 0
 
 
 def make_dataset(header):
@@ -68,11 +67,13 @@ def make_dataset(header):
             # together to add them on the to_append variable
             for e in mfcc:
                 to_append += f' {np.mean(e)} {np.var(e)}'
+            to_append += f' {g}'
             # add the row of attributes into our data.csv file
             file = open('data.csv', 'a', newline='')
             with file:
                 writer = csv.writer(file)
                 writer.writerow(to_append.split())
+    file.close()
 
 
 def init_dataset_header():
@@ -95,7 +96,7 @@ def init_dataset_header():
     mfcc13_mean mfcc13_var mfcc14_mean mfcc14_var
     mfcc15_mean mfcc15_var mfcc16_mean mfcc16_var
     mfcc17_mean mfcc17_var mfcc18_mean mfcc18_var
-    mfcc19_mean mfcc19_var mfcc20_mean mfcc20_var'''
+    mfcc19_mean mfcc19_var mfcc20_mean mfcc20_var label'''
     header = header.split()
     # Make sure the length of the headers is correct
     make_dataset(header)
