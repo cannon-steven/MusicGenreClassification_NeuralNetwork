@@ -42,12 +42,17 @@ def save_spectrogram(songPath, destination):
 
     # Get song representation as a spectrogram
     y, sr = librosa.load(songPath)
+    plt.axis("off")  # Needed to remove white border from saved image.
     data = librosa.stft(y)
     S_db = librosa.amplitude_to_db(np.abs(data), ref=np.max)
     librosa.display.specshow(S_db)
 
     # Save file to destination
-    plt.savefig(f"{destination}/{filename}")
+    plt.savefig(
+        f"{destination}/{filename}",
+        bbox_inches="tight",  # This and pad_inches and plt.axis("off") remove
+        pad_inches=0.0        # the white borders from the image
+    )
 
     # Clear current axis. Without this the time to save increases with
     # each iteration
@@ -65,12 +70,17 @@ def save_mel_spectrogram(songPath, destination):
 
     # Get song representation as a spectrogram
     y, sr = librosa.load(songPath)
+    plt.axis("off")  # Needed to remove white border from saved image.
     mel = librosa.feature.melspectrogram(y=y, sr=sr)
     S_dB = librosa.power_to_db(mel, ref=np.max)
     librosa.display.specshow(S_dB)
 
     # Save file to destination
-    plt.savefig(f"{destination}/{filename}", bbox_inches="tight", pad_inches=0.0)
+    plt.savefig(
+        f"{destination}/{filename}",
+        bbox_inches="tight",  # This and pad_inches and plt.axis("off") remove
+        pad_inches=0.0        # the white borders from the image
+    )
 
     # Clear current axis. Without this the time to save increases with
     # each iteration
@@ -128,4 +138,4 @@ def generate_mel_spectrogram(inputDirectory, outputDirectory):
 
 if __name__ == '__main__':
     # generate_spectrograms("./Data/genres_original", "./Spectrograms")
-    save_mel_spectrogram("temp.wav", "./")
+    save_spectrogram("temp.wav", "./")
