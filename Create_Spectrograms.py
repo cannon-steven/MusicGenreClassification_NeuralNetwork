@@ -112,7 +112,7 @@ def generate_spectrograms(inputDirectory, outputDirectory):
                 print("- Time taken = ", (time.time() - startTime))
 
 
-def generate_mel_spectrogram(inputDirectory, outputDirectory):
+def generate_mel_spectrograms(inputDirectory, outputDirectory):
     """
     Given the GTZAN genres dataset, creates mel spectrograms and fills a
     training directory
@@ -131,11 +131,9 @@ def generate_mel_spectrogram(inputDirectory, outputDirectory):
             file_png = parse_file_name(song) + ".png"
             if file_png not in os.listdir(f"{outputDirectory}/{genre}"):
                 startTime = time.time()
-                print(f"Generating spectrogram for {song} ", end="")
-                save_mel_spectrogram(f"{inputDirectory}/{genre}/{song}",
-                                 f"{outputDirectory}/{genre}")
+                print(f"Generating mel spectrogram for {song} ", end="")
+                save_mel_spectrogram(
+                    f"{inputDirectory}/{genre}/{song}",
+                    f"{outputDirectory}/{genre}"
+                )
                 print("- Time taken = ", (time.time() - startTime))
-
-if __name__ == '__main__':
-    # generate_spectrograms("./Data/genres_original", "./Spectrograms")
-    save_spectrogram("temp.wav", "./")
