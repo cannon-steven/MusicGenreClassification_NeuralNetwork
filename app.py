@@ -1,4 +1,5 @@
-from flask import Flask, request, Response, render_template
+from flask import Flask, request, render_template
+from flask_cors import CORS, cross_origin
 from tensorflow import keras
 import json
 import loadAndPredict
@@ -9,7 +10,8 @@ import tempfile
 ALLOWED_EXTENSIONS = {'wav'}
 
 app = Flask(__name__)
-
+CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 # We should set the maximum content length
 # (you can check your .wav file size with
 # ls -lh songname.wav):
@@ -40,10 +42,12 @@ def start():
 
 
 @app.route("/main")
+@cross_origin()
 def main_web_page():
     content = get_songs()
     for song in content['songs']:
         song['primaryGenre'] = getMax(song['genre'])
+    print(content['songs'])
     return render_template('main.html', **content)
     # The ** operator turns a dictionary into keyword arguments.
     # {'example': 'data', 'ex2': 'data'} -> example='data', ex2='data'
@@ -51,6 +55,7 @@ def main_web_page():
 
 # --- BACKEND API ---
 @app.route("/songs", methods=["POST"])
+@cross_origin()
 def upload_song():
     # Check that a file is present
     if 'file' not in request.files:
@@ -70,19 +75,40 @@ def upload_song():
     if file and is_allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(temp_dir.name, filename))
-    # Send file to the model
-    genreResults = predict_genre(f'{temp_dir.name}/{filename}')
+    # Get the data from here
+    # genreResults = predict_genre(f'{temp_dir.name}/{filename}')
     # delete the temporary file
     temp_dir.cleanup()
-
-    return Response(
-                    response=json.dumps({
-                                        "filename": file.filename,
-                                        "genre": genreResults
-                                        }),
-                    status=201,  # Maybe use 202? Depends on processing time
-                    content_type="application/json"
-                    )
+    data = {
+        "songs": [
+            {
+                "filename": "blues.wav",
+                "genre": {
+                    "blues": 61, "classical": 5, "country": 5,
+                    "disco": 4, "hiphop": 5, "jazz": 5, "metal": 5,
+                    "pop": 5, "reggae": 5, "rock": 5
+                }
+            },
+            {
+                "filename": "bad.wav",
+                "genre": {
+                    "blues": 60, "classical": 5, "country": 5,
+                    "disco": 5, "hiphop": 5, "jazz": 5, "metal": 5,
+                    "pop": 5, "reggae": 5, "rock": 5
+                }
+            },
+            {
+                "filename": "thriller.wav",
+                "genre": {
+                    "blues": 65, "classical": 5, "country": 5,
+                    "disco": 0, "hiphop": 5, "jazz": 5, "metal": 5,
+                    "pop": 5, "reggae": 5, "rock": 5
+                }
+            }
+        ]
+    }
+    return render_template('main.html',
+                           songs=json.dumps(data))
 
 
 # --- TESTING STUBS ---
@@ -94,29 +120,44 @@ def predict_genre(file):
 
 
 def get_songs():
+    # Get the data from a text file
     return {
         "songs": [
             {
-                "filename": "beat_it.wav",
+                "filename": "blues.wav",
                 "genre": {
-                    "rock": 80,
-                    "pop": 20
+                    "blues": 61, "classical": 5, "country": 5,
+                    "disco": 4, "hiphop": 5, "jazz": 5, "metal": 5,
+                    "pop": 5, "reggae": 5, "rock": 5
                 }
             },
             {
                 "filename": "bad.wav",
                 "genre": {
-                    "rock": 75,
-                    "pop": 25
+                    "blues": 60, "classical": 5, "country": 5,
+                    "disco": 5, "hiphop": 5, "jazz": 5, "metal": 5,
+                    "pop": 5, "reggae": 5, "rock": 5
                 }
             },
             {
                 "filename": "thriller.wav",
                 "genre": {
-                    "rock": 80,
-                    "pop": 20,
-                    "spooks": 100
+                    "blues": 65, "classical": 5, "country": 5,
+                    "disco": 0, "hiphop": 5, "jazz": 5, "metal": 5,
+                    "pop": 5, "reggae": 5, "rock": 5
+                }
+            },
+            {
+                "filename": "hello.wav",
+                "genre": {
+                    "blues": 65, "classical": 5, "country": 5,
+                    "disco": 0, "hiphop": 5, "jazz": 5, "metal": 5,
+                    "pop": 5, "reggae": 5, "rock": 5
                 }
             }
         ]
     }
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
