@@ -156,9 +156,10 @@ def split_audio(inputPath, outputPath):
     chunks = make_chunks(originalAudio, chunk_length=chunkLength)
 
     for i, chunk in enumerate(chunks):
-        chunk_name = f"{file}.chunk{i}.wav"
-        print(f"exporting {chunk_name}")
-        chunk.export(f"{outputPath}/{chunk_name}", format="wav")
+        if i < 10:
+            chunk_name = f"{file}.chunk{i}.wav"
+            print(f"exporting {chunk_name}")
+            chunk.export(f"{outputPath}/{chunk_name}", format="wav")
 
 
 def split_all(inputDirectory, outputDirectory):
