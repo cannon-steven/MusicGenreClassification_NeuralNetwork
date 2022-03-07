@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import time
+from pydub import AudioSegment
+from pydub.utils import make_chunks
 
 
 def build_empty_directories(outputDirectory, labels):
@@ -137,3 +139,48 @@ def generate_mel_spectrograms(inputDirectory, outputDirectory):
                     f"{outputDirectory}/{genre}"
                 )
                 print("- Time taken = ", (time.time() - startTime))
+
+
+def split_audio(inputPath, outputPath):
+    """
+    Given the path to a 30 second .wav file, splits the audio into ten 3 second
+    .wav files and saves them to the output path
+    """
+    file = parse_file_name(inputPath)
+
+    # Get audio
+    originalAudio = AudioSegment.from_file(inputPath, format="wav")
+
+    # Split audio into chunks
+    chunkLength = 3000  # milliseconds
+    chunks = make_chunks(originalAudio, chunk_length=chunkLength)
+
+    for i, chunk in enumerate(chunks):
+        chunk_name = f"{file}.chunk{i}.wav"
+        print(f"exporting {chunk_name}")
+        chunk.export(f"{outputPath}/{chunk_name}", format="wav")
+
+
+def split_all(inputDirectory, outputDirectory):
+    """
+    Takes a directory of subdirectories classified by genre and containing 30
+    second .wav files, divides each of the songs into 3 second segments, and
+    stores all the results in a new directory
+    """
+    # Get list of genres
+    genres = os.listdir(inputDirectory)
+
+    # Create empty directories to put the split audio into
+    dirName = parse_directory(outputDirectory)
+    if dirName not in os.listdir("./"):
+        build_empty_directories(outputDirectory, genres)
+
+    # Get songs and split them into segments
+    for genre in genres:
+        for song in os.listdir(f"{inputDirectory}/{genre}"):
+            startTime = time.time()
+            print(f"Exporting chunked audio for {song} ", end="")
+            split_audio(
+                f"{inputDirectory}/{genre}/{song}",
+                f"{outputDirectory}/{genre}")
+            print("- Time taken = ", (time.time() - startTime))
