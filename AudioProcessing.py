@@ -158,7 +158,6 @@ def split_audio(inputPath, outputPath):
     for i, chunk in enumerate(chunks):
         if i < 10:
             chunk_name = f"{file}.chunk{i}.wav"
-            print(f"exporting {chunk_name}")
             chunk.export(f"{outputPath}/{chunk_name}", format="wav")
 
 
@@ -179,9 +178,7 @@ def split_all(inputDirectory, outputDirectory):
     # Get songs and split them into segments
     for genre in genres:
         for song in os.listdir(f"{inputDirectory}/{genre}"):
-            startTime = time.time()
-            print(f"Exporting chunked audio for {song} ", end="")
+            print(f"Exporting chunked audio for {song}")
             split_audio(
                 f"{inputDirectory}/{genre}/{song}",
                 f"{outputDirectory}/{genre}")
-            print("- Time taken = ", (time.time() - startTime))
