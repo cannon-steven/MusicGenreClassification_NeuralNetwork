@@ -22,8 +22,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 # SONG_PATH = "hiphop.00000.wav"
 # SONG_PATH = "pop.00000.wav"
 
-imageHeight = 149
-imageWidth = 200
+imageHeight = 369
+imageWidth = 496
 
 class_names = ['blues', 'classical', 'country', 'hiphop', 'jazz', 'pop', 'metal', 'reggae', 'rock']
 
@@ -36,7 +36,7 @@ def makePrediction(song):
     y_forLength, sr = librosa.load(song)
     songLength = librosa.get_duration(y=y_forLength, sr=sr)
     midpoint = songLength // 2
-    y, sr = librosa.load(song, offset=midpoint, duration=6)
+    y, sr = librosa.load(song, offset=midpoint, duration=3)
 
     #########################################################################
 
@@ -61,12 +61,12 @@ def makePrediction(song):
 
     plt.savefig("tempSpec.png")
 
-    image = Image.open('tempSpec.png')
-    image.thumbnail((200, 200))
-    image.save('tempThumb.png')
+    # image = Image.open('tempSpec.png')
+    # image.thumbnail((200, 200))
+    # image.save('tempThumb.png')
 
     img = tf.keras.utils.load_img(
-        'tempThumb.png', target_size=(imageHeight, imageWidth)
+        'tempSpec.png', target_size=(imageHeight, imageWidth)
     )
     img_array = tf.keras.utils.img_to_array(img)
     img_array = img_array / 255
@@ -94,8 +94,8 @@ def makePrediction(song):
     # print(score)
 
     os.remove('tempSpec.png')
-    os.remove('tempThumb.png')
-
+    # os.remove('tempThumb.png')
+    print(np.array(score))
     return np.array(score)
     # print(
     #     "This image most likely belongs to {} with a {:.2f} percent confidence."
