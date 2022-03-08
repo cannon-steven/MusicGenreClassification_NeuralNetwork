@@ -5,7 +5,7 @@ import numpy as np
 import os
 import librosa
 import librosa.display
-
+from pydub import AudioSegment
 
 imageHeight = 369
 imageWidth = 496
@@ -14,12 +14,30 @@ class_names = ['blues', 'classical', 'country', 'hiphop', 'jazz', 'pop',
                'metal', 'reggae', 'rock']
 
 
-def makePrediction(song):
+def mp3_to_wav(mp3FilePath):
+    """
+    Given the path to an .mp3 file, creates a .wav copy and returns the path to
+    the copy
+    """
+    # Get file path as .wav
+    wavFilePath = f"{mp3FilePath[0:-4]}.wav"
+
+    # Copy mp3 file to wav
+    sound = AudioSegment.from_mp3(mp3FilePath)
+    sound.export(wavFilePath, format="wav")
+
+    return wavFilePath
+
+
+def makePrediction(song, mp3=False):
     """
     Given the path to a .wav file, makes a prediction on the genre of the song.
     Returns an array of confidences for the 10 genres
     """
     model = keras.models.load_model("MusicClassifier")
+
+    if mp3:
+        song = mp3_to_wav(song)
 
     # Load song from the middle point and only use 3 seconds
     y_forLength, sr = librosa.load(song)
