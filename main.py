@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 from dataArrayModel import cnn_data_array, make_genres_dict
 from dataArrayModel import check_for_duplicates
 from loadAndPredict import makePrediction
-ALLOWED_EXTENSIONS = {'wav'}
+ALLOWED_EXTENSIONS = {'mp3'}
 
 app = Flask(__name__)
 
@@ -55,13 +55,13 @@ def upload_song():
     # Check that a file is present
     if 'file' not in request.files:
         return {"error":    "No file, or form input unnamed."
-                            + " Expected a .wav file input named 'file'"
+                            + " Expected a .mp3 file input named 'file'"
                 }, 400
 
     # Verify file extension
     file = request.files["file"]
     if not is_allowed_file(file.filename):  # file.filename = "example.wav"
-        return {"error": "Expected a .wav file"}, 400
+        return {"error": "Expected a .mp3 file"}, 400
 
     # Make a temporary directory where you can save uploaded files
     temp_dir = tempfile.TemporaryDirectory()
