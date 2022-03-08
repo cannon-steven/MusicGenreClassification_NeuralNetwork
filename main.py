@@ -1,11 +1,10 @@
 from flask import Flask, request, render_template
-from tensorflow import keras
 
 
 # SECTION: The Team's file imports
 from dataArrayModel import cnn_data_array, make_genres_dict
 from dataArrayModel import check_for_duplicates
-
+from loadAndPredict import makePrediction
 ALLOWED_EXTENSIONS = {'wav'}
 app = Flask(__name__)
 
