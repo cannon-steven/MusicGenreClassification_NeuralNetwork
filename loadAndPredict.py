@@ -15,6 +15,10 @@ class_names = ['blues', 'classical', 'country', 'hiphop', 'jazz', 'pop',
 
 
 def makePrediction(song):
+    """
+    Given the path to a .wav file, makes a prediction on the genre of the song.
+    Returns an array of confidences for the 10 genres
+    """
     model = keras.models.load_model("MusicClassifier")
 
     # Load song from the middle point and only use 3 seconds
