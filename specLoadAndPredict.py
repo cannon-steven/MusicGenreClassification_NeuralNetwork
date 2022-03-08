@@ -32,17 +32,17 @@ def makePrediction(song):
 
     # To load song from the middle point and only use 3 seconds ############
 
-    # y_forLength, sr = librosa.load(song)
-    # songLength = librosa.get_duration(y=y_forLength, sr=sr)
-    # midpoint = songLength // 2
-    # y, sr = librosa.load(song, offset=midpoint, duration=3)
+    y_forLength, sr = librosa.load(song)
+    songLength = librosa.get_duration(y=y_forLength, sr=sr)
+    midpoint = songLength // 2
+    y, sr = librosa.load(song, offset=midpoint, duration=9)
 
     #########################################################################
 
 
     # To load entire song ###################################################
 
-    y, sr = librosa.load(song)
+    # y, sr = librosa.load(song)
 
     #########################################################################
 

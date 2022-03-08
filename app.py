@@ -4,8 +4,8 @@ from tensorflow import keras
 
 
 # SECTION: The Team's file imports
-import loadAndPredict
-from data_array import cnn_data_array, make_genres_dict, check_for_duplicates
+from dataArrayModel import cnn_data_array, make_genres_dict
+from dataArrayModel import check_for_duplicates
 from specLoadAndPredict import makePrediction
 
 ALLOWED_EXTENSIONS = {'wav'}
@@ -91,21 +91,12 @@ def upload_song():
                            **content)
 
 
-# --- TESTING STUBS ---
-def predict_genre(file):
-    model = keras.models.load_model("my_model")
-
-    prediction = loadAndPredict.predict(model, file)
-    return prediction
-
-
 def get_songs():
     # Make a feature that will save data
     # in the state of the application while the server is running.
     return {
         "songs": cnn_data_array
     }
-
 
 if __name__ == '__main__':
     app.run(debug=True)
