@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template
 
 
-# SECTION: The Team's file imports
+# SECTION: The Team's file import
 from dataArrayModel import cnn_data_array, make_genres_dict
 from dataArrayModel import check_for_duplicates
 from loadAndPredict import makePrediction
