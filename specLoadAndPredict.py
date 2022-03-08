@@ -6,18 +6,19 @@ import os
 import librosa
 import librosa.display
 from PIL import Image
+import matplotlib
+matplotlib.use('Agg')
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 
 
 # local files on my computer for testing
-
 # SONG_PATH = "Pathfinder.wav"
 # SONG_PATH = "Clincher.wav"
 # SONG_PATH = "California.wav"
 # SONG_PATH = "Metal3.wav"
 # SONG_PATH = "SomeOtherMetal.wav"
-# SONG_PATH = "Father.wav"
+SONG_PATH = "hiphop_song.wav"
 
 imageHeight = 149
 imageWidth = 200
@@ -84,11 +85,12 @@ def makePrediction(song):
     os.remove('tempSpec.png')
     os.remove('tempThumb.png')
 
+    return list(score.numpy())
 
 # main function for testing purposes
 
 # if __name__ == '__main__':
     # print(sys.argv[1])
     # model = keras.models.load_model("second_model")
-    # makePrediction(SONG_PATH, model)
+    # makePrediction(SONG_PATH)
     # makePrediction(sys.argv[1], model)
