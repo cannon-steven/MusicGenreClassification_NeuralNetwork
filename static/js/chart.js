@@ -27,7 +27,7 @@ function makeChart(song, arrayIndex){
     const data = {
         labels: [
             "blues", "classical", "country",
-            "disco", "hiphop", "jazz",
+            "hiphop", "jazz",
             "metal","pop", "reggae",
             "rock"
         ],
@@ -41,7 +41,6 @@ function makeChart(song, arrayIndex){
             'pink',
             'red',
             'purple',
-            'maroon',
             'orange',
             'green',
             'black'
