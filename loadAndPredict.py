@@ -22,7 +22,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 # SONG_PATH = "hiphop.00000.wav"
 # SONG_PATH = "pop.00000.wav"
 
-
 imageHeight = 149
 imageWidth = 200
 
