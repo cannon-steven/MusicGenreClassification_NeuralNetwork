@@ -6,16 +6,18 @@ import os
 import librosa
 import librosa.display
 from PIL import Image
+import matplotlib
+matplotlib.use('Agg')
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 
 # local files on my computer for testing
-
 # SONG_PATH = "Pathfinder.wav"
 # SONG_PATH = "Clincher.wav"
 # SONG_PATH = "California.wav"
 # SONG_PATH = "Metal3.wav"
 # SONG_PATH = "SomeOtherMetal.wav"
+# SONG_PATH = "hiphop_song.wav"
 # SONG_PATH = "Follow.wav"
 # SONG_PATH = "hiphop.00000.wav"
 # SONG_PATH = "pop.00000.wav"
