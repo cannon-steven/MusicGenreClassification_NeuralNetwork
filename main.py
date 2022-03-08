@@ -7,11 +7,11 @@ from tensorflow import keras
 import loadAndPredict
 from data_array import cnn_data_array, make_genres_dict, check_for_duplicates
 
+
 ALLOWED_EXTENSIONS = {'wav'}
 
 app = Flask(__name__)
-CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
+
 # We should set the maximum content length
 # (you can check your .wav file size with
 # ls -lh songname.wav):
@@ -42,12 +42,12 @@ def start():
 
 
 @app.route("/main")
-@cross_origin()
+
 def main_web_page():
     content = get_songs()
     for song in content['songs']:
         song['primaryGenre'] = getMax(song['genre'])
-    print(content['songs'])
+
     return render_template('main.html', **content)
     # The ** operator turns a dictionary into keyword arguments.
     # {'example': 'data', 'ex2': 'data'} -> example='data', ex2='data'
@@ -55,7 +55,6 @@ def main_web_page():
 
 # --- BACKEND API ---
 @app.route("/songs", methods=["POST"])
-@cross_origin()
 def upload_song():
     # Check that a file is present
     if 'file' not in request.files:
@@ -67,6 +66,7 @@ def upload_song():
     file = request.files["file"]
     if not is_allowed_file(file.filename):  # file.filename = "example.wav"
         return {"error": "Expected a .wav file"}, 400
+
     # THIS ARRAY NEEDS TO COME FROM THE MODEL
     array_from_cnn_model = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     print(cnn_data_array)
@@ -82,6 +82,7 @@ def upload_song():
     content = get_songs()
     return render_template('main.html',
                            **content)
+
 
 
 # --- TESTING STUBS ---
