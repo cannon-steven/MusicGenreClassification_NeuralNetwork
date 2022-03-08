@@ -10,10 +10,8 @@ import librosa.display
 imageHeight = 369
 imageWidth = 496
 
-
 class_names = ['blues', 'classical', 'country', 'hiphop', 'jazz', 'pop',
                'metal', 'reggae', 'rock']
-
 
 
 def makePrediction(song):
@@ -28,20 +26,6 @@ def makePrediction(song):
     songLength = librosa.get_duration(y=y_forLength, sr=sr)
     midpoint = songLength // 2
 
-
-    #########################################################################
-
-    # To load entire song ###################################################
-
-    # y, sr = librosa.load(song)
-
-    #########################################################################
-
-    # To load first 30 seconds of song ######################################
-
-    # y, sr = librosa.load(song, duration=30)
-
-
     # Get clip as spectrogram
     y, sr = librosa.load(song, offset=midpoint, duration=3)
     plt.axis("off")  # Needed to remove white border from saved image.
@@ -49,14 +33,12 @@ def makePrediction(song):
     S_db = librosa.amplitude_to_db(np.abs(data), ref=np.max)
     librosa.display.specshow(S_db)
 
-
     # Save file to temp
     tempfile = "tempSpec.png"
     plt.savefig(
         tempfile,
         bbox_inches="tight",  # This and pad_inches and plt.axis("off") remove
         pad_inches=0.0        # the white borders from the image
-
     )
 
     # Load spectrogram
