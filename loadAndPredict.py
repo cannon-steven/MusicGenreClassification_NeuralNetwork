@@ -29,7 +29,7 @@ def mp3_to_wav(mp3FilePath):
     return wavFilePath
 
 
-def makePrediction(song, mp3=False):
+def makePrediction(song, mp3=True):
     """
     Given the path to a .wav file, makes a prediction on the genre of the song.
     Returns an array of confidences for the 10 genres
