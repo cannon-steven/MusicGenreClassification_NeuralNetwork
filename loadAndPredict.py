@@ -5,38 +5,25 @@ import numpy as np
 import os
 import librosa
 import librosa.display
-from PIL import Image
-import matplotlib
-matplotlib.use('Agg')
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
-
-# local files on my computer for testing
-# SONG_PATH = "Pathfinder.wav"
-# SONG_PATH = "Clincher.wav"
-# SONG_PATH = "California.wav"
-# SONG_PATH = "Metal3.wav"
-# SONG_PATH = "SomeOtherMetal.wav"
-# SONG_PATH = "hiphop_song.wav"
-# SONG_PATH = "Follow.wav"
-# SONG_PATH = "hiphop.00000.wav"
-# SONG_PATH = "pop.00000.wav"
 
 imageHeight = 369
 imageWidth = 496
 
-class_names = ['blues', 'classical', 'country', 'hiphop', 'jazz', 'pop', 'metal', 'reggae', 'rock']
+
+class_names = ['blues', 'classical', 'country', 'hiphop', 'jazz', 'pop',
+               'metal', 'reggae', 'rock']
+
 
 
 def makePrediction(song):
     model = keras.models.load_model("MusicClassifier")
 
-    # To load song from the middle point and only use 3 seconds ############
-
+    # Load song from the middle point and only use 3 seconds
     y_forLength, sr = librosa.load(song)
     songLength = librosa.get_duration(y=y_forLength, sr=sr)
     midpoint = songLength // 2
-    y, sr = librosa.load(song, offset=midpoint, duration=3)
+
 
     #########################################################################
 
@@ -50,67 +37,35 @@ def makePrediction(song):
 
     # y, sr = librosa.load(song, duration=30)
 
-    #########################################################################
 
-    plt.axis('off')  # no axis
-    plt.axes([0., 0., 1., 1.], frameon=False, xticks=[], yticks=[])
+    # Get clip as spectrogram
+    y, sr = librosa.load(song, offset=midpoint, duration=3)
+    plt.axis("off")  # Needed to remove white border from saved image.
     data = librosa.stft(y)
     S_db = librosa.amplitude_to_db(np.abs(data), ref=np.max)
     librosa.display.specshow(S_db)
-    plt.margins(0)
 
-    plt.savefig("tempSpec.png")
 
-    # image = Image.open('tempSpec.png')
-    # image.thumbnail((200, 200))
-    # image.save('tempThumb.png')
+    # Save file to temp
+    tempfile = "tempSpec.png"
+    plt.savefig(
+        tempfile,
+        bbox_inches="tight",  # This and pad_inches and plt.axis("off") remove
+        pad_inches=0.0        # the white borders from the image
 
-    img = tf.keras.utils.load_img(
-        'tempSpec.png', target_size=(imageHeight, imageWidth)
     )
-    img_array = tf.keras.utils.img_to_array(img)
-    img_array = img_array / 255
+
+    # Load spectrogram
+    img = tf.keras.utils.load_img(tempfile, target_size=(imageHeight,
+                                  imageWidth))
+    img_array = tf.keras.utils.load_img(img)
     img_array = tf.expand_dims(img_array, 0)  # Create a batch
 
-    # predictions = model.predict(img_array)
-    predictions = model(img_array)
+    # Send spectrogram to model to make prediction
+    predictions = model.predict(img_array)
     score = tf.nn.softmax(predictions[0])
-    # print(predictions)
-    print(score)
-    #
-    # # norm = tf.keras.utils.normalize(predictions[0], axis=-1, order=2)
-    #
-    # # norm = np.array(norm)
-    # print(norm)
-    #
-    # newNorm = []
-    # for x in norm:
-    #     y = x * 1000
-    #     newNorm.append(y)
-    #
-    # # tf.math.round(newNorm)
-    # print(newNorm)
-    # score = tf.nn.softmax(newNorm)
-    # print(score)
 
+    # Remove temp file
     os.remove('tempSpec.png')
-    # os.remove('tempThumb.png')
-    print(np.array(score))
+
     return np.array(score)
-    # print(
-    #     "This image most likely belongs to {} with a {:.2f} percent confidence."
-    #         .format(class_names[np.argmax(score)], 100 * np.max(score))
-    # )
-
-    # print(
-    #     "This image most likely belongs to {} with a {:.2f} percent confidence."
-    #     .format(class_names[np.argmax(score)], 100 * np.max(score))
-    # )
-
-# main function for testing purposes
-
-# if __name__ == '__main__':
-# print(sys.argv[1])
-# model = keras.models.load_model("second_model")
-# makePrediction(SONG_PATH)
-# makePrediction(sys.argv[1], model)
