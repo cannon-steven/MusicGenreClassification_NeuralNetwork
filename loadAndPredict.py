@@ -44,7 +44,7 @@ def makePrediction(song):
     # Load spectrogram
     img = tf.keras.utils.load_img(tempfile, target_size=(imageHeight,
                                   imageWidth))
-    img_array = tf.keras.utils.load_img(img)
+    img_array = tf.keras.utils.img_to_array(img)
     img_array = tf.expand_dims(img_array, 0)  # Create a batch
 
     # Send spectrogram to model to make prediction
