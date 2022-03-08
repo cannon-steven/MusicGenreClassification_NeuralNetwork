@@ -1,10 +1,12 @@
-from flask import Flask, request, Response, render_template
+from flask import Flask, request, render_template
+from flask_cors import CORS, cross_origin
 from tensorflow import keras
-import json
+
+
+# SECTION: The Team's file imports
 import loadAndPredict
-import os
-from werkzeug.utils import secure_filename
-import tempfile
+from data_array import cnn_data_array, make_genres_dict, check_for_duplicates
+
 
 ALLOWED_EXTENSIONS = {'wav'}
 
@@ -40,10 +42,12 @@ def start():
 
 
 @app.route("/main")
+
 def main_web_page():
     content = get_songs()
     for song in content['songs']:
         song['primaryGenre'] = getMax(song['genre'])
+
     return render_template('main.html', **content)
     # The ** operator turns a dictionary into keyword arguments.
     # {'example': 'data', 'ex2': 'data'} -> example='data', ex2='data'
@@ -63,26 +67,22 @@ def upload_song():
     if not is_allowed_file(file.filename):  # file.filename = "example.wav"
         return {"error": "Expected a .wav file"}, 400
 
-    # make a temporary directory where you can save uploaded files
-    temp_dir = tempfile.TemporaryDirectory()
-    # make sure the file is not wrapped in the fileStorage class
-    # before sending it to the predict_genre
-    if file and is_allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(temp_dir.name, filename))
-    # Send file to the model
-    genreResults = predict_genre(f'{temp_dir.name}/{filename}')
-    # delete the temporary file
-    temp_dir.cleanup()
+    # THIS ARRAY NEEDS TO COME FROM THE MODEL
+    array_from_cnn_model = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    print(cnn_data_array)
+    if check_for_duplicates(cnn_data_array, file.filename):
+        print('Cant upload same file twice')
+        content = get_songs()
+        render_template('main.html', content)
+    data = {
+                "filename": '{}'.format(file.filename),
+                "genre": make_genres_dict(array_from_cnn_model)
+            }
+    cnn_data_array.append(data)
+    content = get_songs()
+    return render_template('main.html',
+                           **content)
 
-    return Response(
-                    response=json.dumps({
-                                        "filename": file.filename,
-                                        "genre": genreResults
-                                        }),
-                    status=201,  # Maybe use 202? Depends on processing time
-                    content_type="application/json"
-                    )
 
 
 # --- TESTING STUBS ---
@@ -94,29 +94,12 @@ def predict_genre(file):
 
 
 def get_songs():
+    # Make a feature that will save data
+    # in the state of the application while the server is running.
     return {
-        "songs": [
-            {
-                "filename": "beat_it.wav",
-                "genre": {
-                    "rock": 80,
-                    "pop": 20
-                }
-            },
-            {
-                "filename": "bad.wav",
-                "genre": {
-                    "rock": 75,
-                    "pop": 25
-                }
-            },
-            {
-                "filename": "thriller.wav",
-                "genre": {
-                    "rock": 80,
-                    "pop": 20,
-                    "spooks": 100
-                }
-            }
-        ]
+        "songs": cnn_data_array
     }
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

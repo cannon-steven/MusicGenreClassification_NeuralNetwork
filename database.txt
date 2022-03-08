@@ -1,0 +1,36 @@
+{
+        "songs": [
+            {
+                "filename": "blues.wav",
+                "genre": {
+                    "blues": 61, "classical": 5, "country": 5,
+                    "disco": 4, "hiphop": 5, "jazz": 5, "metal": 5,
+                    "pop": 5, "reggae": 5, "rock": 5
+                }
+            },
+            {
+                "filename": "bad.wav",
+                "genre": {
+                    "blues": 60, "classical": 5, "country": 5,
+                    "disco": 5, "hiphop": 5, "jazz": 5, "metal": 5,
+                    "pop": 5, "reggae": 5, "rock": 5
+                }
+            },
+            {
+                "filename": "thriller.wav",
+                "genre": {
+                    "blues": 65, "classical": 5, "country": 5,
+                    "disco": 0, "hiphop": 5, "jazz": 5, "metal": 5,
+                    "pop": 5, "reggae": 5, "rock": 5
+                }
+            },
+            {
+                "filename": "hello.wav",
+                "genre": {
+                    "blues": 65, "classical": 5, "country": 5,
+                    "disco": 0, "hiphop": 5, "jazz": 5, "metal": 5,
+                    "pop": 5, "reggae": 5, "rock": 5
+                }
+            }
+        ]
+    }
