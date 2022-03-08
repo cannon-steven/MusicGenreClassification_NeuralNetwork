@@ -1,0 +1,101 @@
+from flask import Flask, request, render_template
+from flask_cors import CORS, cross_origin
+from tensorflow import keras
+
+
+# SECTION: The Team's file imports
+from dataArrayModel import cnn_data_array, make_genres_dict
+from dataArrayModel import check_for_duplicates
+from specLoadAndPredict import makePrediction
+
+ALLOWED_EXTENSIONS = {'wav'}
+app = Flask(__name__)
+CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+# We should set the maximum content length
+# (you can check your .wav file size with
+# ls -lh songname.wav):
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
+
+
+# --- HELPER FUNCTIONS ---
+# https://flask.palletsprojects.com/en/2.0.x/patterns/fileuploads/
+def is_allowed_file(filename):
+    """Returns True/False if a given file ends with an allowed extension"""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def getMax(dict):
+    """Finds the element in a dictionary whose value is the greatest"""
+    max = None
+    for element in dict:
+        if max is None or dict[element] > dict[max]:
+            max = element
+    return max
+
+
+# --- WEB PAGES ---
+@app.route("/")
+def start():
+    return render_template('start.html')
+
+
+@app.route("/main")
+@cross_origin()
+def main_web_page():
+    content = get_songs()
+    for song in content['songs']:
+        song['primaryGenre'] = getMax(song['genre'])
+    print(content['songs'])
+    return render_template('main.html', **content)
+    # The ** operator turns a dictionary into keyword arguments.
+    # {'example': 'data', 'ex2': 'data'} -> example='data', ex2='data'
+
+
+# --- BACKEND API ---
+@app.route("/songs", methods=["POST"])
+@cross_origin()
+def upload_song():
+    # Check that a file is present
+    if 'file' not in request.files:
+        return {"error":    "No file, or form input unnamed."
+                            + " Expected a .wav file input named 'file'"
+                }, 400
+
+    # Verify file extension
+    file = request.files["file"]
+    if not is_allowed_file(file.filename):  # file.filename = "example.wav"
+        return {"error": "Expected a .wav file"}, 400
+    # SECTION: arr_data calls makePrediction
+    # with the filename of the uploaded file
+    arr_data = makePrediction(file.filename)
+    array_from_cnn_model = list(map(lambda x: int(x*100), arr_data))
+    # Check for duplicate uploads
+    if check_for_duplicates(cnn_data_array, file.filename):
+        content = get_songs()
+        return render_template('main.html', **content)
+    # Make the new data structure to append to array
+    data = {
+                "filename": '{}'.format(file.filename),
+                "genre": make_genres_dict(array_from_cnn_model)
+            }
+    cnn_data_array.append(data)
+    content = get_songs()
+    # Add the primary Genre to the data structure
+    # and render the template with the new data structure
+    for song in content['songs']:
+        song['primaryGenre'] = getMax(song['genre'])
+    return render_template('main.html',
+                           **content)
+
+
+def get_songs():
+    # Make a feature that will save data
+    # in the state of the application while the server is running.
+    return {
+        "songs": cnn_data_array
+    }
+
+if __name__ == '__main__':
+    app.run(debug=True)
