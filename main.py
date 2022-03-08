@@ -62,7 +62,7 @@ def upload_song():
     file = request.files["file"]
     if not is_allowed_file(file.filename):  # file.filename = "example.wav"
         return {"error": "Expected a .wav file"}, 400
-    
+
     # Make a temporary directory where you can save uploaded files
     temp_dir = tempfile.TemporaryDirectory()
     # make sure the file is not wrapped in the fileStorage class
