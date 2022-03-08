@@ -1,17 +1,15 @@
-from flask import Flask, request, render_template
-from flask_cors import CORS, cross_origin
+from flask import Flask, request, Response, render_template
 from tensorflow import keras
-
-
-# SECTION: The Team's file imports
-from dataArrayModel import cnn_data_array, make_genres_dict
-from dataArrayModel import check_for_duplicates
-from specLoadAndPredict import makePrediction
+import json
+import loadAndPredict
+import os
+from werkzeug.utils import secure_filename
+import tempfile
 
 ALLOWED_EXTENSIONS = {'wav'}
+
 app = Flask(__name__)
-CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
+
 # We should set the maximum content length
 # (you can check your .wav file size with
 # ls -lh songname.wav):
@@ -42,12 +40,10 @@ def start():
 
 
 @app.route("/main")
-@cross_origin()
 def main_web_page():
     content = get_songs()
     for song in content['songs']:
         song['primaryGenre'] = getMax(song['genre'])
-    print(content['songs'])
     return render_template('main.html', **content)
     # The ** operator turns a dictionary into keyword arguments.
     # {'example': 'data', 'ex2': 'data'} -> example='data', ex2='data'
@@ -55,7 +51,6 @@ def main_web_page():
 
 # --- BACKEND API ---
 @app.route("/songs", methods=["POST"])
-@cross_origin()
 def upload_song():
     # Check that a file is present
     if 'file' not in request.files:
@@ -67,36 +62,61 @@ def upload_song():
     file = request.files["file"]
     if not is_allowed_file(file.filename):  # file.filename = "example.wav"
         return {"error": "Expected a .wav file"}, 400
-    # SECTION: arr_data calls makePrediction
-    # with the filename of the uploaded file
-    arr_data = makePrediction(file.filename)
-    array_from_cnn_model = list(map(lambda x: int(x*100), arr_data))
-    # Check for duplicate uploads
-    if check_for_duplicates(cnn_data_array, file.filename):
-        print('Cant upload same file twice')
-        content = get_songs()
-        return render_template('main.html', **content)
-    # Make the new data structure to append to array
-    data = {
-                "filename": '{}'.format(file.filename),
-                "genre": make_genres_dict(array_from_cnn_model)
-            }
-    cnn_data_array.append(data)
-    content = get_songs()
-    # Add the primary Genre to the data structure
-    # and render the template with the new data structure
-    for song in content['songs']:
-        song['primaryGenre'] = getMax(song['genre'])
-    return render_template('main.html',
-                           **content)
+
+    # make a temporary directory where you can save uploaded files
+    temp_dir = tempfile.TemporaryDirectory()
+    # make sure the file is not wrapped in the fileStorage class
+    # before sending it to the predict_genre
+    if file and is_allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(temp_dir.name, filename))
+    # Send file to the model
+    genreResults = predict_genre(f'{temp_dir.name}/{filename}')
+    # delete the temporary file
+    temp_dir.cleanup()
+
+    return Response(
+                    response=json.dumps({
+                                        "filename": file.filename,
+                                        "genre": genreResults
+                                        }),
+                    status=201,  # Maybe use 202? Depends on processing time
+                    content_type="application/json"
+                    )
+
+
+# --- TESTING STUBS ---
+def predict_genre(file):
+    model = keras.models.load_model("my_model")
+
+    prediction = loadAndPredict.predict(model, file)
+    return prediction
 
 
 def get_songs():
-    # Make a feature that will save data
-    # in the state of the application while the server is running.
     return {
-        "songs": cnn_data_array
+        "songs": [
+            {
+                "filename": "beat_it.wav",
+                "genre": {
+                    "rock": 80,
+                    "pop": 20
+                }
+            },
+            {
+                "filename": "bad.wav",
+                "genre": {
+                    "rock": 75,
+                    "pop": 25
+                }
+            },
+            {
+                "filename": "thriller.wav",
+                "genre": {
+                    "rock": 80,
+                    "pop": 20,
+                    "spooks": 100
+                }
+            }
+        ]
     }
-
-if __name__ == '__main__':
-    app.run(debug=True)
