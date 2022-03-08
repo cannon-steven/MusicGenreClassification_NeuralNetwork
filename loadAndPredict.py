@@ -27,7 +27,7 @@ class_names = ['blues', 'classical', 'country', 'hiphop', 'jazz', 'pop', 'metal'
 
 
 def makePrediction(song):
-    model = keras.models.load_model("second_model")
+    model = keras.models.load_model("MusicClassifier")
 
     # To load song from the middle point and only use 3 seconds ############
 
