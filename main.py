@@ -62,13 +62,13 @@ def upload_song():
     file = request.files["file"]
     if not is_allowed_file(file.filename):  # file.filename = "example.wav"
         return {"error": "Expected a .wav file"}, 400
-        # make a temporary directory where you can save uploaded files
+    
+    # Make a temporary directory where you can save uploaded files
     temp_dir = tempfile.TemporaryDirectory()
     # make sure the file is not wrapped in the fileStorage class
     # before sending it to the predict_genre
-    if file and is_allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(temp_dir.name, filename))
+    filename = secure_filename(file.filename)
+    file.save(os.path.join(temp_dir.name, filename))
 
     # SECTION: arr_data calls makePrediction
     # with the filename of the uploaded file
