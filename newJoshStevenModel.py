@@ -6,8 +6,8 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import pandas as pd
 
-imageHeight = 149
-imageWidth = 200
+imageHeight = 369
+imageWidth = 496
 
 
 def plotValidate(history):
@@ -16,19 +16,19 @@ def plotValidate(history):
 
 
 
-def createDataset():
+def createDataset(inputDirectoryPath):
     specList = []
     genreList = []
     genres = "blues classical country hiphop jazz metal pop reggae rock"
     for g in genres.split():
         # loop through the genres directory
         # and pick the wav file from each genre directory
-        for filename in os.listdir(f'./noDiscoClean/{g}'):
+        for filename in os.listdir(f'{inputDirectoryPath}/{g}'):
             if filename == ".DS_Store":
                 pass
             else:
                 img = keras.utils.load_img(
-                    f'./noDiscoClean/{g}/{filename}', target_size=(imageHeight, imageWidth)
+                    f'{inputDirectoryPath}/{g}/{filename}', target_size=(imageHeight, imageWidth)
                 )
                 img_array = keras.utils.img_to_array(img)
                 specList.append(img_array)
@@ -71,7 +71,7 @@ def convertGenres(genreList):
 
 
 if __name__ == '__main__':
-    X, y = createDataset()
+    X, y = createDataset("./Spectrograms")
 
     y = convertGenres(y)
 
