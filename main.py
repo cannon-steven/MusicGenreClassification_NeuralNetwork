@@ -1,9 +1,13 @@
 from flask import Flask, request, render_template
+import tempfile
+import os
+from werkzeug.utils import secure_filename
 # SECTION: The Team's file import
 from dataArrayModel import cnn_data_array, make_genres_dict
 from dataArrayModel import check_for_duplicates
 from loadAndPredict import makePrediction
 ALLOWED_EXTENSIONS = {'wav'}
+
 app = Flask(__name__)
 
 # We should set the maximum content length
@@ -58,17 +62,25 @@ def upload_song():
     file = request.files["file"]
     if not is_allowed_file(file.filename):  # file.filename = "example.wav"
         return {"error": "Expected a .wav file"}, 400
+        # make a temporary directory where you can save uploaded files
+    temp_dir = tempfile.TemporaryDirectory()
+    # make sure the file is not wrapped in the fileStorage class
+    # before sending it to the predict_genre
+    if file and is_allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(temp_dir.name, filename))
+
     # SECTION: arr_data calls makePrediction
     # with the filename of the uploaded file
-    arr_data = makePrediction(file.filename)
+    arr_data = makePrediction(f'{temp_dir.name}/{filename}')
     array_from_cnn_model = list(map(lambda x: int(x*100), arr_data))
     # Check for duplicate uploads
-    if check_for_duplicates(cnn_data_array, file.filename):
+    if check_for_duplicates(cnn_data_array, f'{filename}'):
         content = get_songs()
         return render_template('main.html', **content)
     # Make the new data structure to append to array
     data = {
-                "filename": '{}'.format(file.filename),
+                "filename": '{}'.format(f'{filename}'),
                 "genre": make_genres_dict(array_from_cnn_model)
             }
     cnn_data_array.append(data)
