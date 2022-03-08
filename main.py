@@ -6,6 +6,7 @@ import os
 from werkzeug.utils import secure_filename
 import tempfile
 
+
 ALLOWED_EXTENSIONS = {'wav'}
 
 app = Flask(__name__)
@@ -63,26 +64,22 @@ def upload_song():
     if not is_allowed_file(file.filename):  # file.filename = "example.wav"
         return {"error": "Expected a .wav file"}, 400
 
-    # make a temporary directory where you can save uploaded files
-    temp_dir = tempfile.TemporaryDirectory()
-    # make sure the file is not wrapped in the fileStorage class
-    # before sending it to the predict_genre
-    if file and is_allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(temp_dir.name, filename))
-    # Send file to the model
-    genreResults = predict_genre(f'{temp_dir.name}/{filename}')
-    # delete the temporary file
-    temp_dir.cleanup()
+    # THIS ARRAY NEEDS TO COME FROM THE MODEL
+    array_from_cnn_model = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    print(cnn_data_array)
+    if check_for_duplicates(cnn_data_array, file.filename):
+        print('Cant upload same file twice')
+        content = get_songs()
+        render_template('main.html', content)
+    data = {
+                "filename": '{}'.format(file.filename),
+                "genre": make_genres_dict(array_from_cnn_model)
+            }
+    cnn_data_array.append(data)
+    content = get_songs()
+    return render_template('main.html',
+                           **content)
 
-    return Response(
-                    response=json.dumps({
-                                        "filename": file.filename,
-                                        "genre": genreResults
-                                        }),
-                    status=201,  # Maybe use 202? Depends on processing time
-                    content_type="application/json"
-                    )
 
 
 # --- TESTING STUBS ---
