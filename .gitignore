@@ -6,5 +6,6 @@ genres
 venv
 .vscode
 data.csv
+second_model
 # Ignore files with the specific extension
 *.wav
