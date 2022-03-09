@@ -6,6 +6,8 @@ import os
 import librosa
 import librosa.display
 from pydub import AudioSegment
+import matplotlib
+matplotlib.use('Agg')
 
 imageHeight = 369
 imageWidth = 496
